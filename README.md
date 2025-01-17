@@ -12,10 +12,9 @@ https://threejs.org/
 import {MiniCAD} from 'miniCAD.js';
 
 const scene = new THREE.Scene();
+const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: 0xffffff}));
 
 const miniCAD = new MiniCAD(scene);
-
-const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: 0xffffff}));
 
 miniCAD.add(box, 'mesh', "Box 1");
 ```
