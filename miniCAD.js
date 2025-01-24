@@ -2,10 +2,10 @@
         ThFrAng
         2025
 
-https://github.com/ThFrAng/miniCAD
+https://github.com/ThFrAng/miniCAD/
 
 powered by georgealways  lil-gui
-https://github.com/georgealways/lil-gui
+https://github.com/georgealways/lil-gui/
 
 for three.js
 https://threejs.org/
@@ -119,9 +119,17 @@ function load(gui, scene) {
 
 
 
+
 function toolGui(gui, object, type, scene) {
     const elementFolder = gui.addFolder('properties');
+    let material = 0;
     if (type == 'mesh') {
+        object.traverse((o) => {
+            if(o.isMesh) {
+                material = o.material;
+            }
+        });
+        
         const params = {
             position_x: object.position.x,
             position_y: object.position.y,
@@ -131,7 +139,7 @@ function toolGui(gui, object, type, scene) {
             scale_z: object.scale.z,
             rotation_x: object.rotation.x,
             rotation_y: object.rotation.y,
-            rotation_z: object.rotation.z
+            rotation_z: object.rotation.z,
         };
 
         elementFolder.add(params, 'position_x').onChange(function(value) {
@@ -161,6 +169,14 @@ function toolGui(gui, object, type, scene) {
         elementFolder.add(params, 'rotation_z', 0, 2*Math.PI).onChange(function(value) {
             object.rotation.z = value;
         });
+        console.log(material);
+        if(material != 0 && material.isShaderMaterial != 1) {
+            params.color = material.color;
+
+            elementFolder.addColor(params, 'color').onChange(function(value) {
+                material.color.setHex(value);
+            });
+        }
     }
     if (type == 'light') {
         if(object.isSpotLight) {
@@ -184,9 +200,10 @@ function toolGui(gui, object, type, scene) {
                     lightElements = shadowGui();
                 }
             });
-            lightElements = directionalGui();
+            lightElements = spotGui();
 
-            function spotGui(lightFolder) {
+            function spotGui() {
+                const lightFolder = elementFolder.addFolder();
                 let params = {
                     position_x: object.position.x,
                     position_y: object.position.y,
@@ -255,6 +272,8 @@ function toolGui(gui, object, type, scene) {
                 helperFolder.add(helper, 'visible').onChange(function() {
                     helper.updateVisibility();
                 });
+
+                return lightFolder;
             }
         }
         else if(object.isRectAreaLight) {
