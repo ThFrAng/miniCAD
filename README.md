@@ -8,6 +8,9 @@ https://github.com/georgealways/lil-gui/
 for three.js
 https://threejs.org/
 <br/><br/>
+
+![Screenshot miniCAD](https://github.com/user-attachments/assets/6f457069-228d-4f4b-b8f6-b74c5619d8ca)
+
 ```js
 import {MiniCAD} from 'miniCAD.js';
 
