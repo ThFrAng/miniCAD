@@ -17,10 +17,15 @@ import {GUI} from './jsm/libs/lil-gui.module.min.js';
 
 import {RectAreaLightHelper} from 'three/addons/helpers/RectAreaLightHelper.js';
 import {MeshBVHHelper} from 'https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js';
+import { CSMHelper } from 'three/addons/csm/CSMHelper.js';
 
 let objects = [];
 let names = [];
+let customFolder = [];
 
+let bufferCameraPosition = new THREE.Vector3(0, 0, 0);
+
+let id = 0;
 
 class Collection {
 
@@ -46,6 +51,7 @@ class Collection {
             mesh: mesh,
             type: type,
             name: newName,
+            id: 0,
             save: 0
         }
 
@@ -62,13 +68,13 @@ const collection = new Collection();
 
 
 export class MiniCAD {
-    constructor(scene) {
+    constructor(scene, camera) {
         const gui = new GUI({title: 'miniCAD'});
-
+        
         const initFolder = gui.addFolder('init');
         const initParams = {
             open: function () {
-                load(gui, scene);
+                load(gui, scene, camera);
                 initFolder.destroy();
             }
         }
@@ -78,11 +84,19 @@ export class MiniCAD {
     }
 
     add(mesh, type, name) {
-        collection.add(mesh, type, name);
+        id++;
+        collection.add(mesh, type, name, id);
+    }
+
+    addCustom(object, name) {
+        id++;
+        name = "Custom " + name;
+        collection.add(object, 'custom', name);
+        customFolder[id] = gui;
     }
 }
 
-function load(gui, scene) {
+function load(gui, scene, camera) {
     const headerFolder = gui.addFolder('header');
     var elementFolder;
     var selectedObject = 0;
@@ -93,6 +107,20 @@ function load(gui, scene) {
             collection.saveObject(selectedObject, gui);
             save();
         },
+        camera_x: camera.position.x,
+        camera_y: camera.position.y,
+        camera_z: camera.position.z,
+        set: function() {
+            camera.position.copy(bufferCameraPosition);
+        },
+        get: function() {
+            headerParams.camera_x = camera.position.x;
+            controllerX.updateDisplay();
+            headerParams.camera_y = camera.position.y;
+            controllerY.updateDisplay();
+            headerParams.camera_z = camera.position.z;
+            controllerZ.updateDisplay();
+        },
         object: 'Select object',
         locate: function () {
             if(selectedObject != 0) {
@@ -102,6 +130,17 @@ function load(gui, scene) {
     }
 
     headerFolder.add(headerParams, 'save');
+    const controllerX = headerFolder.add(headerParams, 'camera_x').onChange(function(value) {
+        bufferCameraPosition.x = value;
+    });
+    const controllerY = headerFolder.add(headerParams, 'camera_y').onChange(function(value) {
+        bufferCameraPosition.y = value;
+    });
+    const controllerZ = headerFolder.add(headerParams, 'camera_z').onChange(function(value) {
+        bufferCameraPosition.z = value;
+    });
+    headerFolder.add(headerParams, 'set').name("set camera position");
+    headerFolder.add(headerParams, 'get').name("get camera position");
     headerFolder.add(headerParams, 'object', collection.getNames()).name('object').onChange(function(value) {
         
         if(selectedObject != 0) {
@@ -443,7 +482,8 @@ function toolGui(gui, object, type, scene) {
                 right: object.shadow.camera.right,
                 top: object.shadow.camera.top,
                 bottom: object.shadow.camera.bottom,
-                blur_samples: object.shadow.blurSamples
+                blur_samples: object.shadow.blurSamples,
+                bias: object.shadow.bias
             };
 
             shadowFolder.add(params, 'shadow').onChange(function(value) {
@@ -477,6 +517,9 @@ function toolGui(gui, object, type, scene) {
                 object.shadow.blurSamples = value;
                 object.shadow.camera.updateProjectionMatrix();
             });
+            shadowFolder.add(params, 'bias').onChange(function(value) {
+                object.shadow.bias = value;
+            })
             
             return shadowFolder;
         }
@@ -536,6 +579,38 @@ function toolGui(gui, object, type, scene) {
             helper.update();
         })
     }
+    if(type == 'csm') {
+        let params = {
+            intensity: object.lightIntensity,
+            bias: object.shadowBias,
+            cascades: object.cascades,
+            light_direction_x: object.lightDirection.x,
+            light_direction_y: object.lightDirection.y,
+            light_direction_z: object.lightDirection.z,
+        }
+
+        elementFolder.add(params, 'intensity').onChange(function(value) {
+            object.lightIntensity = value;
+        });
+        elementFolder.add(params, 'bias').onChange(function(value) {
+            object.shadowBias = value;
+        });
+        elementFolder.add(params, 'cascades').onChange(function(value) {
+            object.cascades = value;
+        });
+        elementFolder.add(params, 'light_direction_x', -1, 1).onChange(function(value) {
+            object.lightDirection.x = value;
+        });
+        elementFolder.add(params, 'light_direction_y', -1, 1).onChange(function(value) {
+            object.lightDirection.y = value;
+        });
+        elementFolder.add(params, 'light_direction_z', -1, 1).onChange(function(value) {
+            object.lightDirection.z = value;
+        });
+    }
+    if(type == 'custom') {
+        customFolder[object.id].parent(elementFolder);
+    }
     return elementFolder;
 }
 
@@ -576,21 +651,19 @@ function save() {
 }
 
 
-export function pos(camera) {
-    let position = "x: " + camera.position.x + "  y: " + camera.position.y + "  z: " + camera.position.z;
-    console.log(position);
+function toolCustomGui(gui, object, scene) {
+    console.log(customParams);
+    let params = {};
+    for(let i = 0; i < customParams.length; i++) {
+        params.customParams[i].name = customParams[i].read;
+
+        gui.add(params, customParams[i]).onChange(function(value) {
+            customParams[i].write = value;
+        });
+    }
 }
 
 
-
-
-function heading(camera) {
-    var vector = new THREE.Vector3();
-    camera.getWorldDirection(vector);
-    let heading = "x: " + vector.x + "  y: " + vector.y + "  z: " + vector.z;
-    console.log(heading);
-
-    var angle = Math.atan(Math.abs(vector.z) / Math.abs(vector.x));
-    //console.log(angle);
-
+export function pos(camera) {
+    console.log("x: " + camera.position.x + "  y: " + camera.position.y + "  z: " + camera.position.z);
 }
