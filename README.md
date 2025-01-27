@@ -23,7 +23,7 @@ miniCAD.**add(obj, 'type', "name");**
 <br/><br/>Adds an object to the miniCAD
 
 - obj - the object to add to the miniCAD
-- type - type of the object : 'mesh', 'light', 'fog', 'color', 'bvh'
+- type - type of the object : 'mesh', 'light', 'fog', 'color', 'bvh', 'csm'
   (other types will be added in the futur, you can request types you need)
 
 - name - name given to the object, this name will be displayed in the miniCAD, if name identical, it will be incremented 
