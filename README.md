@@ -26,7 +26,34 @@ miniCAD.**add(obj, 'type', "name");**
 <br/><br/>Adds an object to the miniCAD
 
 - obj - the object to add to the miniCAD
-- type - type of the object : 'mesh', 'light', 'fog', 'color', 'bvh', 'csm'
-  (other types will be added in the futur, you can request types you need)
+- type - type of the object : 'mesh', 'material', 'phongMaterial', 'light', 'fog', 'color', 'bvh', 'csm'
+  (other types will be added in the futur, requests can be made to support new types)
 
-- name - name given to the object, this name will be displayed in the miniCAD, if name identical, it will be incremented 
+- name - name given to the object, this name will be displayed in the miniCAD, if name identical, it will be incremented
+
+<br/><br/>
+**Controls**
+
+Once miniCAD is open, position of camera can be changed.<br/>
+Arrow up and down can move the camera up and down by one any time
+
+<br/><br/>
+**Types**
+
+- **'mesh' :** basic controls for meshes
+  
+- **'material' :** basic controls for all materials, for exemple MeshStandardMaterial
+  
+- **'phongMaterial' :** adjust MeshPhongMaterial settings
+  
+- **'light' :** settings for any king of light. It can also adjusts the settings of the shadow for lights that can cast shadows. Supports spotLight, rectAreaLight directionalLight, ambientLight, hemisphereLight
+
+- **'fog' :** basic controls for fog or fogExp2
+
+- **'color' :** adjust color of an element. must provide the color as obj
+<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ex : miniCAD.add(material.color, 'color', "Color of the material");
+
+- **'bvh' :** basic controls for bvh **work in progress**
+
+- **'csm' :** basic controls for csm **work in progress**
+
