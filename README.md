@@ -51,7 +51,9 @@ Arrow up and down can move the camera up and down by one any time
 - **'fog' :** basic controls for fog or fogExp2
 
 - **'color' :** adjust color of an element. must provide the color as obj
-<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ex : miniCAD.add(material.color, 'color', "Color of the material");
+```js
+    miniCAD.add(material.color, 'color', "Color of the material");
+```
 
 - **'bvh' :** basic controls for bvh **work in progress**
 
