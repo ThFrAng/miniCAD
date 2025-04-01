@@ -101,6 +101,16 @@ function load(gui, scene, camera) {
     var elementFolder;
     var selectedObject = 0;
 
+    document.addEventListener('keydown', function(event) {
+        switch (event.code) {
+            case "ArrowUp":
+                camera.position.y += 1;
+                break;
+            case "ArrowDown":
+                camera.position.y -= 1;
+                break;
+        }
+    })
 
     const headerParams = {
         save: function() {
@@ -110,9 +120,6 @@ function load(gui, scene, camera) {
         camera_x: camera.position.x,
         camera_y: camera.position.y,
         camera_z: camera.position.z,
-        set: function() {
-            camera.position.copy(bufferCameraPosition);
-        },
         get: function() {
             headerParams.camera_x = camera.position.x;
             controllerX.updateDisplay();
@@ -131,15 +138,20 @@ function load(gui, scene, camera) {
 
     headerFolder.add(headerParams, 'save');
     const controllerX = headerFolder.add(headerParams, 'camera_x').onChange(function(value) {
+        bufferCameraPosition.copy(camera.position);
         bufferCameraPosition.x = value;
+        camera.position.copy(bufferCameraPosition);
     });
     const controllerY = headerFolder.add(headerParams, 'camera_y').onChange(function(value) {
+        bufferCameraPosition.copy(camera.position);
         bufferCameraPosition.y = value;
+        camera.position.copy(bufferCameraPosition);
     });
     const controllerZ = headerFolder.add(headerParams, 'camera_z').onChange(function(value) {
+        bufferCameraPosition.copy(camera.position);
         bufferCameraPosition.z = value;
+        camera.position.copy(bufferCameraPosition);
     });
-    headerFolder.add(headerParams, 'set').name("set camera position");
     headerFolder.add(headerParams, 'get').name("get camera position");
     headerFolder.add(headerParams, 'object', collection.getNames()).name('object').onChange(function(value) {
         
@@ -208,7 +220,6 @@ function toolGui(gui, object, type, scene) {
         elementFolder.add(params, 'rotation_z', 0, 2*Math.PI).onChange(function(value) {
             object.rotation.z = value;
         });
-        console.log(material);
         if(material != 0 && material.isShaderMaterial != 1) {
             params.color = material.color;
 
@@ -216,6 +227,61 @@ function toolGui(gui, object, type, scene) {
                 material.color.setHex(value);
             });
         }
+    }
+    if(type == 'material') {
+        if(object.isMaterial) {
+            const params = {
+                color: object.color.getHex(),
+                transparent: object.transparent,
+                opacity: object.opacity
+            }
+            elementFolder.addColor(params, 'color').onChange(function(value) {
+                object.color.setHex(value);
+            });
+            elementFolder.add(params, 'transparent').onChange(function(value) {
+                object.transparent = value;
+            });
+            elementFolder.add(params, 'opacity', 0, 1, 0.001).onChange(function(value) {
+                object.opacity = value;
+            });
+        }
+    }
+    if(type == 'phongMaterial') {
+        const params = {
+            color: object.color.getHex(),
+            emissive: object.emissive.getHex(),
+            specular: object.specular.getHex(),
+            transparent: object.transparent,
+            opacity: object.opacity,
+            shininess: object.shininess,
+            reflectivity: object.reflectivity,
+            refraction_ratio: object.refractionRatio
+
+        }
+        elementFolder.addColor(params, 'color').onChange(function(value) {
+            object.color.setHex(value);
+        });
+        elementFolder.addColor(params, 'emissive').onChange(function(value) {
+            object.emissive.setHex(value);
+        });
+        elementFolder.addColor(params, 'specular').onChange(function(value) {
+            object.specular.setHex(value);
+        });
+        elementFolder.add(params, 'transparent').onChange(function(value) {
+            object.transparent = value;
+        });
+        elementFolder.add(params, 'opacity', 0, 1, 0.001).onChange(function(value) {
+            object.opacity = value;
+        });
+        elementFolder.add(params, 'shininess', 0, 100).onChange(function(value) {
+            object.shininess = value;
+        });
+        elementFolder.add(params, 'reflectivity', 0, 1, 0.01).onChange(function(value) {
+            object.reflectivity = value;
+        });
+        elementFolder.add(params, 'refraction_ratio', 0, 1, 0.01).onChange(function(value) {
+            object.refractionRation = value;
+        });
     }
     if (type == 'light') {
         if(object.isSpotLight) {
@@ -450,6 +516,57 @@ function toolGui(gui, object, type, scene) {
                 return lightFolder;
             }
         }
+        else if(object.isAmbientLight) {
+            let params = {
+                intensity: object.intensity,
+                color: object.color.getHex()
+            }
+            elementFolder.add(params, 'intensity').onChange(function(value) {
+                object.intensity = value;
+            });
+            elementFolder.addColor(params, 'color').onChange(function(value) {
+                object.color.setHex(value);
+            });
+        }
+        else if(object.isHemisphereLight) {
+            const helper = new THREE.HemisphereLightHelper(object);        
+            scene.add(helper);
+            helper.visible = false;
+
+            let params = {
+                position_x: object.position.x,
+                position_y: object.position.y,
+                position_z: object.position.z,
+                intensity: object.intensity,
+                color: object.color.getHex(),
+                ground_color: object.groundColor.getHex()
+            }
+
+            elementFolder.add(params, 'position_x').onChange(function(value) {
+                object.position.x = value;
+                helper.update();
+            });
+            elementFolder.add(params, 'position_y').onChange(function(value) {
+                object.position.y = value;
+                helper.update();
+            });
+            elementFolder.add(params, 'position_z').onChange(function(value) {
+                object.position.z = value;
+                helper.update();
+            });
+            elementFolder.add(params, 'intensity').onChange(function(value) {
+                object.intensity = value;
+            });
+            elementFolder.addColor(params, 'color').onChange(function(value) {
+                object.color.setHex(value);
+            });
+            elementFolder.addColor(params, 'ground_color').onChange(function(value) {
+                object.groundColor.setHex(value);
+            });
+            const helperFolder = elementFolder.addFolder('helper');
+            helperFolder.add(helper, 'visible').onChange(function() {
+            });
+        }
         else {
             let params = {
                 position_x: object.position.x,
@@ -582,6 +699,8 @@ function toolGui(gui, object, type, scene) {
     if(type == 'csm') {
         let params = {
             intensity: object.lightIntensity,
+            color: object.settings.lightColor.getHex(),
+            max_far: object.maxFar,
             bias: object.shadowBias,
             cascades: object.cascades,
             light_direction_x: object.lightDirection.x,
@@ -592,6 +711,12 @@ function toolGui(gui, object, type, scene) {
         elementFolder.add(params, 'intensity').onChange(function(value) {
             object.lightIntensity = value;
         });
+        elementFolder.addColor(params, 'color').onChange(function(value) {
+            object.lightColor.setHex(value);
+        });
+        elementFolder.add(params, 'max_far').onChange(function(value) {
+            object.maxFar = value;
+        })
         elementFolder.add(params, 'bias').onChange(function(value) {
             object.shadowBias = value;
         });
@@ -661,9 +786,4 @@ function toolCustomGui(gui, object, scene) {
             customParams[i].write = value;
         });
     }
-}
-
-
-export function pos(camera) {
-    console.log("x: " + camera.position.x + "  y: " + camera.position.y + "  z: " + camera.position.z);
 }
