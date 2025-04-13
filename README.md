@@ -12,7 +12,7 @@ https://threejs.org/
 ![Screenshot miniCAD](https://github.com/user-attachments/assets/6f457069-228d-4f4b-b8f6-b74c5619d8ca)
 
 ```js
-import {MiniCAD} from 'miniCAD.js';
+import {MiniCAD} from './miniCAD/miniCAD.js';
 
 const scene = new THREE.Scene();
 const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: 0xffffff}));
@@ -59,3 +59,9 @@ Arrow up and down can move the camera up and down by one any time
 
 - **'csm' :** basic controls for csm **work in progress**
 
+<br/><br/>
+**Options and settings**
+
+Some options can be toggled on and off in the settings.json
+- Pointer selector : output the name given to a mesh by miniCAD.add() in the top left corner to easily find a particular mesh.
+  A mouse click will select an object. Also works in the pointer lock
