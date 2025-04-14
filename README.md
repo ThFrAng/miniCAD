@@ -36,6 +36,7 @@ miniCAD.**add(obj, 'type', "name");**
 
 Once miniCAD is open, position of camera can be changed.<br/>
 Arrow up and down can move the camera up and down by one any time
+Can be disabled in the settings. Up and down keys can be remapped.
 
 <br/><br/>
 **Types**
@@ -65,3 +66,5 @@ Arrow up and down can move the camera up and down by one any time
 Some options can be toggled on and off in the settings.json
 - Pointer selector : output the name given to a mesh by miniCAD.add() in the top left corner to easily find a particular mesh.
   A mouse click will select an object. Also works in the pointer lock
+- Up and Down : adds 1 to camera y position with up and down key to quickly reposition the camera.
+  up and down keys can be remapped in the settings
