@@ -1,3 +1,6 @@
 {
-    "USE_POINTERSELECTOR": "true"
+    "USE_POINTERSELECTOR": "true",
+    "USE_UPDOWNKEYS": "true",
+    "UPKEY": "ArrowUp",
+    "DOWNKEY": "ArrowDown"
 }

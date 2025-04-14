@@ -104,17 +104,6 @@ function load(gui, scene, camera) {
     var elementFolder;
     var selectedObject = 0;
 
-    document.addEventListener('keydown', function(event) {
-        switch (event.code) {
-            case "ArrowUp":
-                camera.position.y += 1;
-                break;
-            case "ArrowDown":
-                camera.position.y -= 1;
-                break;
-        }
-    })
-
     const headerParams = {
         save: function() {
             collection.saveObject(selectedObject, gui);

@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-
 import settings from './settings.json' with { type: 'json' };
-//const USE_POINTERSELECTOR = true;
 
 export function loadOptions(camera, collection) {
     
@@ -63,5 +61,18 @@ export function loadOptions(camera, collection) {
             objectNameDiv.innerHTML = selectedName
 
         });
+    }
+
+    if(settings.USE_UPDOWNKEYS) {
+        document.addEventListener('keydown', function(event) {
+            switch (event.code) {
+                case settings.UPKEY:
+                    camera.position.y += 1;
+                    break;
+                case settings.DOWNKEY:
+                    camera.position.y -= 1;
+                    break;
+            }
+        })
     }
 }
