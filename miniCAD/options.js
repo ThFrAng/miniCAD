@@ -37,10 +37,12 @@ export function loadOptions(camera, collection) {
             let x = 0;
 
             for(let i = 0; i < names.length; i++) {
-                const intersect = mouseRay.intersectObject(collection.getObject(names[i]).mesh);
-                if(intersect.length > 0) {
-                    intersected[x] = [i, intersect[0].distance];  
-                    x++;
+                if(collection.getObject(names[i]).type == 'mesh') {
+                    const intersect = mouseRay.intersectObject(collection.getObject(names[i]).mesh, true);
+                    if(intersect.length > 0) {
+                        intersected[x] = [i, intersect[0].distance];  
+                        x++;
+                    }
                 }
             }
 
