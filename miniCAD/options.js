@@ -11,7 +11,7 @@ for three.js
 https://threejs.org/
 
 */
-s
+
 import * as THREE from 'three';
 import settings from './settings.json' with {type: 'json'};
 
