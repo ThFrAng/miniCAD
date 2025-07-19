@@ -14,8 +14,11 @@ https://threejs.org/
 
 import * as THREE from 'three';
 import {GUI} from '../jsm/libs/lil-gui.module.min.js';
+import {TransformControls} from 'three/addons/controls/TransformControls.js';
 
+import {ToolGui} from './toolGui.js';
 import {loadOptions} from './options.js';
+import settings from './settings.json' with {type: 'json'};
 
 import {RectAreaLightHelper} from 'three/addons/helpers/RectAreaLightHelper.js';
 import {MeshBVHHelper} from 'https://cdn.jsdelivr.net/npm/three-mesh-bvh@0.7.3/build/index.module.js';
@@ -24,10 +27,13 @@ import {CSMHelper} from 'three/addons/csm/CSMHelper.js';
 let objects = [];
 let names = [];
 let customFolder = [];
+let toolGui;
 
 let bufferCameraPosition = new THREE.Vector3(0, 0, 0);
 
 let id = 0;
+
+let base = {};
 
 class Collection {
 
@@ -70,18 +76,24 @@ const collection = new Collection();
 
 
 export class MiniCAD {
-    constructor(scene, camera) {
+    constructor(scene, camera, renderer) {
         const gui = new GUI({title: 'miniCAD'});
-        
+        toolGui = new ToolGui(base, gui);
+        base.camera = camera;
+        base.scene = scene;
+        base.renderer = renderer;
+
         const initFolder = gui.addFolder('init');
         const initParams = {
             open: function () {
-                load(gui, scene, camera);
+                load(gui, base);
                 initFolder.destroy();
+                
+                if(settings.transformation.USE_TRANSFORMATION_TOOLS == "true") {toolGui.init()}
             }
         }
         initFolder.add(initParams, 'open');
-        loadOptions(camera, collection);
+        loadOptions(base.camera, collection);
 
         gui.open();
     }
@@ -99,7 +111,7 @@ export class MiniCAD {
     }
 }
 
-function load(gui, scene, camera) {
+function load(gui, base) {
     const headerFolder = gui.addFolder('header');
     var elementFolder;
     var selectedObject = 0;
@@ -109,15 +121,15 @@ function load(gui, scene, camera) {
             collection.saveObject(selectedObject, gui);
             save();
         },
-        camera_x: camera.position.x,
-        camera_y: camera.position.y,
-        camera_z: camera.position.z,
+        camera_x: base.camera.position.x,
+        camera_y: base.camera.position.y,
+        camera_z: base.camera.position.z,
         get: function() {
-            headerParams.camera_x = camera.position.x;
+            headerParams.camera_x = base.camera.position.x;
             controllerX.updateDisplay();
-            headerParams.camera_y = camera.position.y;
+            headerParams.camera_y = base.camera.position.y;
             controllerY.updateDisplay();
-            headerParams.camera_z = camera.position.z;
+            headerParams.camera_z = base.camera.position.z;
             controllerZ.updateDisplay();
         },
         object: 'Select object',
@@ -130,19 +142,19 @@ function load(gui, scene, camera) {
 
     headerFolder.add(headerParams, 'save');
     const controllerX = headerFolder.add(headerParams, 'camera_x').onChange(function(value) {
-        bufferCameraPosition.copy(camera.position);
+        bufferCameraPosition.copy(base.camera.position);
         bufferCameraPosition.x = value;
-        camera.position.copy(bufferCameraPosition);
+        base.camera.position.copy(bufferCameraPosition);
     });
     const controllerY = headerFolder.add(headerParams, 'camera_y').onChange(function(value) {
-        bufferCameraPosition.copy(camera.position);
+        bufferCameraPosition.copy(base.camera.position);
         bufferCameraPosition.y = value;
-        camera.position.copy(bufferCameraPosition);
+        base.camera.position.copy(bufferCameraPosition);
     });
     const controllerZ = headerFolder.add(headerParams, 'camera_z').onChange(function(value) {
-        bufferCameraPosition.copy(camera.position);
+        bufferCameraPosition.copy(base.camera.position);
         bufferCameraPosition.z = value;
-        camera.position.copy(bufferCameraPosition);
+        base.camera.position.copy(bufferCameraPosition);
     });
     headerFolder.add(headerParams, 'get').name("get camera position");
     headerFolder.add(headerParams, 'object', collection.getNames()).name('object').onChange(function(value) {
@@ -154,20 +166,68 @@ function load(gui, scene, camera) {
         selectedObject = collection.getObject(value);
         var oldFolder = elementFolder;
 
-        elementFolder = toolGui(gui, selectedObject.mesh, selectedObject.type, scene);
+        elementFolder = paramsGui(gui, selectedObject.mesh, selectedObject.type, base.scene);
+        toolGui.attachObject(selectedObject);
         oldFolder.destroy();
     });
     const locateButton = headerFolder.add(headerParams, 'locate').name('locate');
 }
 
 
+function locateObject(object, locateButton) {
+    object.mesh.traverse((o) => {
+        if(o.isMesh) {
+            locateButton.disable();
+            const material = o.material;
+            o.material = new THREE.MeshBasicMaterial({color: 0xff0000});
+
+            setTimeout(function() {
+                o.material = material;
+                locateButton.enable();
+            }, 1000);
+        }
+    });
+}
 
 
-function toolGui(gui, object, type, scene) {
+function save() {
+    let save = [];
+
+    for(let i = 0; i < names.length; i++) {
+        
+        const selectedObject = collection.getObject(names[i]);
+        
+        const object = {
+            name: names[i],
+            parameters: selectedObject.save
+        }
+        if(object.parameters != 0) {
+            save[i] = object;
+        }
+    }
+    console.log(save);
+    alert("Saved as an array in the console");
+}
+
+function moveToCamera(object) {
+    object.position.set(base.camera.position.x, base.camera.position.y, base.camera.position.z);
+}
+
+
+export function paramsGui(gui, object, type, scene) {
     const elementFolder = gui.addFolder('properties');
     if (type == 'mesh') {
         
         const params = {
+            move_to_camera: function() {
+                moveToCamera(object);
+                params.position_x = object.position.x;
+                positionX.updateDisplay();
+                params.position_y = object.position.y;
+                positionY.updateDisplay();
+                params.position_z = object.position.z;
+                positionZ.updateDisplay();
+            },
             position_x: object.position.x,
             position_y: object.position.y,
             position_z: object.position.z,
@@ -179,13 +239,14 @@ function toolGui(gui, object, type, scene) {
             rotation_z: object.rotation.z,
         };
 
-        elementFolder.add(params, 'position_x').onChange(function(value) {
+        elementFolder.add(params, 'move_to_camera').name("move to camera");
+        const positionX = elementFolder.add(params, 'position_x').onChange(function(value) {
             object.position.x = value;
         });
-        elementFolder.add(params, 'position_y').onChange(function(value) {
+        const positionY = elementFolder.add(params, 'position_y').onChange(function(value) {
             object.position.y = value;
         });
-        elementFolder.add(params, 'position_z').onChange(function(value) {
+        const positionZ = elementFolder.add(params, 'position_z').onChange(function(value) {
             object.position.z = value;
         }); 
         elementFolder.add(params, 'scale_x').onChange(function(value) {
@@ -206,6 +267,7 @@ function toolGui(gui, object, type, scene) {
         elementFolder.add(params, 'rotation_z', 0, 2*Math.PI).onChange(function(value) {
             object.rotation.z = value;
         });
+        console.log(positionX);
     }
     if(type == 'material') {
         if(object.isMaterial) {
@@ -369,6 +431,15 @@ function toolGui(gui, object, type, scene) {
             function spotGui() {
                 const lightFolder = elementFolder.addFolder();
                 let params = {
+                    move_to_camera: function() {
+                        moveToCamera(object);
+                        params.position_x = object.position.x;
+                        positionX.updateDisplay();
+                        params.position_y = object.position.y;
+                        positionY.updateDisplay();
+                        params.position_z = object.position.z;
+                        positionZ.updateDisplay();
+                    },
                     position_x: object.position.x,
                     position_y: object.position.y,
                     position_z: object.position.z,
@@ -383,15 +454,16 @@ function toolGui(gui, object, type, scene) {
                     target_z: object.target.position.z
                 };
 
-                lightFolder.add(params, 'position_x').onChange(function(value) {
+                lightFolder.add(params, 'move_to_camera').name("move to camera");
+                const positionX = lightFolder.add(params, 'position_x').onChange(function(value) {
                     object.position.x = value;
                     helper.update();
                 });
-                lightFolder.add(params, 'position_y').onChange(function(value) {
+                const positionY = lightFolder.add(params, 'position_y').onChange(function(value) {
                     object.position.y = value;
                     helper.update();
                 });
-                lightFolder.add(params, 'position_z').onChange(function(value) {
+                const positionZ = lightFolder.add(params, 'position_z').onChange(function(value) {
                     object.position.z = value;
                     helper.update();
                 }); 
@@ -448,6 +520,15 @@ function toolGui(gui, object, type, scene) {
             let target = new THREE.Vector3(0, 0, 0);
             object.lookAt(target);
             let params = {
+                move_to_camera: function() {
+                    moveToCamera(object);
+                    params.position_x = object.position.x;
+                    positionX.updateDisplay();
+                    params.position_y = object.position.y;
+                    positionY.updateDisplay();
+                    params.position_z = object.position.z;
+                    positionZ.updateDisplay();
+                },
                 position_x: object.position.x,
                 position_y: object.position.y,
                 position_z: object.position.z,
@@ -460,13 +541,14 @@ function toolGui(gui, object, type, scene) {
                 target_z: target.z
             };
 
-            elementFolder.add(params, 'position_x').onChange(function(value) {
+            elementFolder.add(params, 'move_to_camera').name("move to camera");
+            const positionX = elementFolder.add(params, 'position_x').onChange(function(value) {
                 object.position.x = value;
             });
-            elementFolder.add(params, 'position_y').onChange(function(value) {
+            const positionY = elementFolder.add(params, 'position_y').onChange(function(value) {
                 object.position.y = value;
             });
-            elementFolder.add(params, 'position_z').onChange(function(value) {
+            const positionZ = elementFolder.add(params, 'position_z').onChange(function(value) {
                 object.position.z = value;
             }); 
             elementFolder.add(params, 'intensity').onChange(function(value) {
@@ -524,6 +606,15 @@ function toolGui(gui, object, type, scene) {
             function directionalGui() {
                 const lightFolder = elementFolder.addFolder();
                 let params = {
+                    move_to_camera: function() {
+                        moveToCamera(object);
+                        params.position_x = object.position.x;
+                        positionX.updateDisplay();
+                        params.position_y = object.position.y;
+                        positionY.updateDisplay();
+                        params.position_z = object.position.z;
+                        positionZ.updateDisplay();
+                    },
                     position_x: object.position.x,
                     position_y: object.position.y,
                     position_z: object.position.z,
@@ -534,15 +625,16 @@ function toolGui(gui, object, type, scene) {
                     target_z: object.target.position.z
                 };
 
-                lightFolder.add(params, 'position_x').onChange(function(value) {
+                lightFolder.add(params, 'move_to_camera').name("move to camera");
+                const positionX = lightFolder.add(params, 'position_x').onChange(function(value) {
                     object.position.x = value;
                     helper.update();
                 });
-                lightFolder.add(params, 'position_y').onChange(function(value) {
+                const positionY = lightFolder.add(params, 'position_y').onChange(function(value) {
                     object.position.y = value;
                     helper.update();
                 });
-                lightFolder.add(params, 'position_z').onChange(function(value) {
+                const positionZ = lightFolder.add(params, 'position_z').onChange(function(value) {
                     object.position.z = value;
                     helper.update();
                 }); 
@@ -593,6 +685,15 @@ function toolGui(gui, object, type, scene) {
             helper.visible = false;
 
             let params = {
+                move_to_camera: function() {
+                    moveToCamera(object);
+                    params.position_x = object.position.x;
+                    positionX.updateDisplay();
+                    params.position_y = object.position.y;
+                    positionY.updateDisplay();
+                    params.position_z = object.position.z;
+                    positionZ.updateDisplay();
+                },
                 position_x: object.position.x,
                 position_y: object.position.y,
                 position_z: object.position.z,
@@ -601,15 +702,16 @@ function toolGui(gui, object, type, scene) {
                 ground_color: object.groundColor.getHex()
             }
 
-            elementFolder.add(params, 'position_x').onChange(function(value) {
+            elementFolder.add(params, 'move_to_camera').name("move to camera");
+            const positionX = elementFolder.add(params, 'position_x').onChange(function(value) {
                 object.position.x = value;
                 helper.update();
             });
-            elementFolder.add(params, 'position_y').onChange(function(value) {
+            const positionY = elementFolder.add(params, 'position_y').onChange(function(value) {
                 object.position.y = value;
                 helper.update();
             });
-            elementFolder.add(params, 'position_z').onChange(function(value) {
+            const positionZ = elementFolder.add(params, 'position_z').onChange(function(value) {
                 object.position.z = value;
                 helper.update();
             });
@@ -624,6 +726,61 @@ function toolGui(gui, object, type, scene) {
             });
             const helperFolder = elementFolder.addFolder('helper');
             helperFolder.add(helper, 'visible').onChange(function() {
+            });
+        }
+        else if(object.isPointLight) {
+            const helper = new THREE.PointLightHelper(object);
+            scene.add(helper);
+            helper.visible = false;
+
+            let params = {
+                move_to_camera: function() {
+                    moveToCamera(object);
+                    params.position_x = object.position.x;
+                    positionX.updateDisplay();
+                    params.position_y = object.position.y;
+                    positionY.updateDisplay();
+                    params.position_z = object.position.z;
+                    positionZ.updateDisplay();
+                },
+                position_x: object.position.x,
+                position_y: object.position.y,
+                position_z: object.position.z,
+                intensity: object.intensity,
+                color: object.color.getHex(),
+                decay: object.decay,
+                distance: object.distance
+            }
+
+            elementFolder.add(params, 'move_to_camera').name("move to camera");
+            const positionX = elementFolder.add(params, 'position_x').onChange(function(value) {
+                object.position.x = value;
+                helper.update();
+            });
+            const positionY = elementFolder.add(params, 'position_y').onChange(function(value) {
+                object.position.y = value;
+                helper.update();
+            });
+            const positionZ = elementFolder.add(params, 'position_z').onChange(function(value) {
+                object.position.z = value;
+                helper.update();
+            });
+            elementFolder.add(params, 'intensity').onChange(function(value) {
+                object.intensity = value;
+            });
+            elementFolder.addColor(params, 'color').onChange(function(value) {
+                object.color.setHex() = value;
+            });
+            elementFolder.add(params, 'decay').onChange(function(value) {
+                object.decay = value;
+            });
+            elementFolder.add(params, 'distance').onChange(function(value) {
+                object.distance = value;
+                helper.update();
+            });
+            const helperFolder = elementFolder.addFolder('helper');
+            helperFolder.add(helper, 'visible').onChange(function() {
+                helper.updateVisibility();
             });
         }
         else {
@@ -647,7 +804,7 @@ function toolGui(gui, object, type, scene) {
                 object.intensity = value;
             });
         }
-    
+
         function shadowGui() {
             const shadowFolder = elementFolder.addFolder();
             let params = {
@@ -758,7 +915,6 @@ function toolGui(gui, object, type, scene) {
     if(type == 'csm') {
         let params = {
             intensity: object.lightIntensity,
-            color: object.settings.lightColor.getHex(),
             max_far: object.maxFar,
             bias: object.shadowBias,
             cascades: object.cascades,
@@ -769,9 +925,6 @@ function toolGui(gui, object, type, scene) {
 
         elementFolder.add(params, 'intensity').onChange(function(value) {
             object.lightIntensity = value;
-        });
-        elementFolder.addColor(params, 'color').onChange(function(value) {
-            object.lightColor.setHex(value);
         });
         elementFolder.add(params, 'max_far').onChange(function(value) {
             object.maxFar = value;
@@ -796,53 +949,4 @@ function toolGui(gui, object, type, scene) {
         customFolder[object.id].parent(elementFolder);
     }
     return elementFolder;
-}
-
-
-function locateObject(object, locateButton) {
-    object.mesh.traverse((o) => {
-        if(o.isMesh) {
-            locateButton.disable();
-            const material = o.material;
-            o.material = new THREE.MeshBasicMaterial({color: 0xff0000});
-
-            setTimeout(function() {
-                o.material = material;
-                locateButton.enable();
-            }, 1000);
-        }
-    });
-}
-
-
-function save() {
-    let save = [];
-
-    for(let i = 0; i < names.length; i++) {
-        
-        const selectedObject = collection.getObject(names[i]);
-        
-        const object = {
-            name: names[i],
-            parameters: selectedObject.save
-        }
-        if(object.parameters != 0) {
-            save[i] = object;
-        }
-    }
-    console.log(save);
-    alert("Saved as an array in the console");
-}
-
-
-function toolCustomGui(gui, object, scene) {
-    console.log(customParams);
-    let params = {};
-    for(let i = 0; i < customParams.length; i++) {
-        params.customParams[i].name = customParams[i].read;
-
-        gui.add(params, customParams[i]).onChange(function(value) {
-            customParams[i].write = value;
-        });
-    }
 }

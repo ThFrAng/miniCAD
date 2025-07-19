@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import settings from './settings.json' with { type: 'json' };
+import settings from './settings.json' with {type: 'json'};
 
 export function loadOptions(camera, collection) {
     
-    if(settings.USE_POINTERSELECTOR) {
+    if(settings.USE_POINTERSELECTOR == "true") {
         
         const mouseRay = new THREE.Raycaster();
         const pointer = new THREE.Vector2();

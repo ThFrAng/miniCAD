@@ -2,5 +2,11 @@
     "USE_POINTERSELECTOR": "true",
     "USE_UPDOWNKEYS": "true",
     "UPKEY": "ArrowUp",
-    "DOWNKEY": "ArrowDown"
+    "DOWNKEY": "ArrowDown",
+    "transformation" : {
+        "_comment": "to use transformation tools, renderer must be past as an argument at initialisation",
+        "USE_TRANSFORMATION_TOOLS": "true",
+        "TOGGLE_TRANSFORMATION": "t"
+    }
+    
 }
