@@ -24,7 +24,7 @@ In the miniCAD, an object must be selected with the dropdown menu to enable the 
 Then the transformation tools can be picked up by pressing T (default key) or enabled in the left GUI.<br>
 Translate, scale and rotaiton are the three tools available.<br><br>
 
-WARNING<br> it is still a beta functionnality<br><br>
+WARNING<br> it is still a beta functionnality<br><br><br>
 
 
 ```js
