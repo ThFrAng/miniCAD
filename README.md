@@ -24,16 +24,17 @@ In the miniCAD, an object must be selected with the dropdown menu to enable the 
 Then the transformation tools can be picked up by pressing T (default key) or enabled in the left GUI.<br>
 Translate, scale and rotaiton are the three tools available.<br><br>
 
-WARNING<br> it is still a beta functionnality
+WARNING<br> it is still a beta functionnality<br><br>
 
 
 ```js
 import {MiniCAD} from './miniCAD/miniCAD.js';
 
 const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 const box = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshBasicMaterial({color: 0xffffff}));
 
-const miniCAD = new MiniCAD(scene);
+const miniCAD = new MiniCAD(scene, camera);
 
 miniCAD.add(box, 'mesh', "Box 1");
 ```
