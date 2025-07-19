@@ -11,21 +11,6 @@ https://threejs.org/
 
 ![Screenshot miniCAD](https://github.com/user-attachments/assets/6f457069-228d-4f4b-b8f6-b74c5619d8ca)
 
-<b>NEW</b><br>
-toolGui is design to move objects easily using the three.js TransFormControls.<br>
-It can be disabled in the settings.<br><br>
-
-To use it the renderer must be pass as an argument in the definition of the miniCAD<br>
-It can also be passed using the method .renderer :<br><br>
-
-miniCAD.**renderer(renderer);**<br><br>
-
-In the miniCAD, an object must be selected with the dropdown menu to enable the transformation tools.<br>
-Then the transformation tools can be picked up by pressing T (default key) or enabled in the left GUI.<br>
-Translate, scale and rotaiton are the three tools available.<br><br>
-
-WARNING<br> it is still a beta functionnality<br><br><br>
-
 
 ```js
 import {MiniCAD} from './miniCAD/miniCAD.js';
@@ -86,3 +71,23 @@ Some options can be toggled on and off in the settings.json
   As for now only works with type 'mesh' objects.
 - Up and Down : adds 1 to camera y position with up and down key to quickly reposition the camera.
   up and down keys can be remapped in the settings
+- Tranformation Tools, keys can be remapped
+
+<br><br>
+<b>Transformation Tools</b><br>
+toolGui is designed to move objects easily using the three.js TransFormControls.<br>
+It can be disabled in the settings.<br><br>
+
+To use it the renderer must be pass as an argument in the definition of the miniCAD<br>
+It can also be passed using the method .renderer :<br><br>
+
+miniCAD.**renderer(renderer);**<br><br>
+
+In the miniCAD, an object must be selected with the dropdown menu to enable the transformation tools.<br>
+Then the transformation tools can be picked up by pressing T (default key) or enabled in the left GUI.<br>
+Translate, scale and rotaiton are the three tools available.<br><br>
+
+The "exit" button can helped to relock a pointerLockControls if used.
+
+
+
