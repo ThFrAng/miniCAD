@@ -76,12 +76,13 @@ const collection = new Collection();
 
 
 export class MiniCAD {
-    constructor(scene, camera, renderer) {
+    constructor(scene, camera, renderer, controls) {
         const gui = new GUI({title: 'miniCAD'});
         toolGui = new ToolGui(base, gui);
         base.camera = camera;
         base.scene = scene;
-        if(renderer != null) {base.renderer = renderer};
+        base.renderer = renderer;
+        base.lockControls = controls;
 
         const initFolder = gui.addFolder('init');
         const initParams = {
@@ -105,6 +106,10 @@ export class MiniCAD {
 
     renderer(renderer) {
         base.renderer = renderer;
+    }
+
+    controls(controls) {
+        base.lockControls = controls;
     }
 }
 
@@ -264,7 +269,6 @@ export function paramsGui(gui, object, type, scene) {
         elementFolder.add(params, 'rotation_z', 0, 2*Math.PI).onChange(function(value) {
             object.rotation.z = value;
         });
-        console.log(positionX);
     }
     if(type == 'material') {
         if(object.isMaterial) {

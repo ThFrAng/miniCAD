@@ -1,9 +1,24 @@
+/*
+        ThFrAng
+        2025
+
+https://github.com/ThFrAng/miniCAD/
+
+powered by georgealways  lil-gui
+https://github.com/georgealways/lil-gui/
+
+for three.js
+https://threejs.org/
+
+*/
+
 import * as THREE from 'three';
 import {GUI} from '../jsm/libs/lil-gui.module.min.js';
 import {TransformControls} from 'three/addons/controls/TransformControls.js';
 import settings from './settings.json' with {type: 'json'};
 
-let base, gui, transformControls, transformationButton, translateButton, scaleButton, rotationButton;
+let base, gui, guiTools, transformControls, toolFolder;
+let transformationButton, translateButton, scaleButton, rotationButton;
 let selectedObject = 0;
 
 export class ToolGui {
@@ -18,7 +33,7 @@ export class ToolGui {
         
         const gizmo = transformControls.getHelper();
 
-        const guiTools = new GUI({title: 'tools', width: 100});
+        guiTools = new GUI({title: 'tools', width: 150});
 
         guiTools.domElement.style.left = 'absolute';
         guiTools.domElement.style.left = '0.5%';
@@ -28,9 +43,16 @@ export class ToolGui {
 
         const optionsFolder = guiTools.addFolder("options");
         let optionsParams = {
+            exit: function() {
+                document.body.requestPointerLock();
+            },
             transformation: false,
         }
-        transformationButton = optionsFolder.add(optionsParams, 'transformation').onChange(function(value) {
+        optionsFolder.add(optionsParams, 'exit')
+        .name("exit (" + settings.transformation.EXIT + ")");
+        transformationButton = optionsFolder.add(optionsParams, 'transformation')
+        .name("transformation (" + settings.transformation.TOGGLE_TRANSFORMATION + ")")
+        .onChange(function(value) {
             if(value) {base.scene.add(gizmo);}
             else {base.scene.remove(gizmo);}
         });
@@ -49,38 +71,53 @@ export class ToolGui {
                     base.scene.remove(gizmo);
                 }
             }
-        })
+            else if(event.key == settings.transformation.EXIT) {
+                document.body.requestPointerLock();
+            }
+        });
 
         const transformationFolder = guiTools.addFolder("");
         let transformationParams = {
             translate: function() {
                 if(optionsParams.transformation == true) {
-                    transformControls.setMode('translate');
-                    translateButton.disable();
-                    rotationButton.enable();
-                    scaleButton.enable();
+                    destroyGui(toolFolder);
+                    enableTranslate();
                 }
             },
             scale: function() {
                 if(optionsParams.transformation == true && selectedObject.type == 'mesh') {
-                    transformControls.setMode('scale');
-                    scaleButton.disable();
-                    translateButton.enable();
-                    rotationButton.enable();
+                    destroyGui(toolFolder);
+                    enableScale();
                 }
             },
             rotation: function() {
                 if(optionsParams.transformation == true && selectedObject.type == 'mesh') {
-                    transformControls.setMode('rotate');
-                    rotationButton.disable();
-                    translateButton.enable();
-                    scaleButton.enable();
+                    destroyGui(toolFolder);
+                    enableRotate();
                 }
             }
         }
-        translateButton = transformationFolder.add(transformationParams, 'translate');
-        scaleButton = transformationFolder.add(transformationParams, 'scale');
-        rotationButton = transformationFolder.add(transformationParams, 'rotation');
+        translateButton = transformationFolder.add(transformationParams, 'translate')
+        .name("translate (" + settings.transformation.TOGGLE_TRANSLATE + ")");
+        scaleButton = transformationFolder.add(transformationParams, 'scale')
+        .name("scale (" + settings.transformation.TOGGLE_SCALE + ")");
+        rotationButton = transformationFolder.add(transformationParams, 'rotation')
+        .name("rotate (" + settings.transformation.TOGGLE_ROTATE + ")");
+
+        document.addEventListener('keydown', function (event) {
+            if(event.key == settings.transformation.TOGGLE_TRANSLATE && optionsParams.transformation == true) {
+                destroyGui(toolFolder);
+                enableTranslate();
+            }
+            else if(event.key == settings.transformation.TOGGLE_SCALE && optionsParams.transformation == true && selectedObject.type == 'mesh') {
+                destroyGui(toolFolder);
+                enableScale();
+            }
+            else if(event.key == settings.transformation.TOGGLE_ROTATE && optionsParams.transformation == true && selectedObject.type == 'mesh') {
+                destroyGui(toolFolder);
+                enableRotate();
+            }
+        });
 
         transformControls.addEventListener( 'dragging-changed', function ( event ) {
             updateObject()
@@ -90,12 +127,8 @@ export class ToolGui {
     attachObject(object) {
         selectedObject = object;
         transformControls.attach(selectedObject.mesh);
-        transformControls.setMode('translate');
-        
         transformationButton.enable();
-        translateButton.disable();
-        scaleButton.enable();
-        rotationButton.enable();
+        enableTranslate();
     }
 }
 
@@ -136,4 +169,139 @@ function updateObject() {
             gui.folders[1].controllers[9].updateDisplay();
         }
     }
+}
+
+function enableTranslate() {
+    
+    transformControls.setMode('translate');
+    translateButton.disable();
+    rotationButton.enable();
+    scaleButton.enable();
+
+    toolFolder = guiTools.addFolder("translate");
+
+    let params = {
+        snap: false,
+        precision: 0,
+    }
+
+    const snap = toolFolder.add(params, "snap")
+    .name("snap (" + settings.transformation.TOGGLE_SNAP + ")")
+    .onChange(function(value) {
+        if(value) {
+            transformControls.setTranslationSnap(1 * Math.pow(10, params.precision));
+        }
+        else {
+            transformControls.setTranslationSnap(null);
+        }
+    });
+    toolFolder.add(params, "precision", -5, 5, 1).name("10e").onChange(function(value) {
+        transformControls.setTranslationSnap(1 * Math.pow(10, value));
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if(event.key == settings.transformation.TOGGLE_SNAP) {
+            if(params.snap == false) {
+                params.snap = true;
+                snap.updateDisplay();
+                transformControls.setTranslationSnap(1 * Math.pow(10, params.precision));
+            }
+            else {
+                params.snap = false;
+                snap.updateDisplay();
+                transformControls.setTranslationSnap(null);
+            }
+        }
+    });
+}
+
+function enableScale() {
+    
+    transformControls.setMode('scale');
+    scaleButton.disable();
+    rotationButton.enable();
+    translateButton.enable();
+
+    toolFolder = guiTools.addFolder("scale");
+
+    let params = {
+        snap: false,
+        precision: 0,
+    }
+
+    const snap = toolFolder.add(params, "snap")
+    .name("snap (" + settings.transformation.TOGGLE_SNAP + ")")
+    .onChange(function(value) {
+        if(value) {
+            transformControls.setScaleSnap(1 * Math.pow(10, params.precision));
+        }
+        else {
+            transformControls.setScaleSnap(null);
+        }
+    });
+    toolFolder.add(params, "precision", -5, 5, 1).name("10e").onChange(function(value) {
+        transformControls.setScaleSnap(1 * Math.pow(10, value));
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if(event.key == settings.transformation.TOGGLE_SNAP) {
+            if(params.snap == false) {
+                params.snap = true;
+                snap.updateDisplay();
+                transformControls.setScaleSnap(1 * Math.pow(10, params.precision));
+            }
+            else {
+                params.snap = false;
+                snap.updateDisplay();
+                transformControls.setScaleSnap(null);
+            }
+        }
+    });
+}
+
+function enableRotate() {
+    
+    transformControls.setMode('rotate');
+    rotationButton.disable();
+    scaleButton.enable();
+    translateButton.enable();
+
+    toolFolder = guiTools.addFolder("rotate");
+
+    let params = {
+        snap: false
+    }
+
+    const snap = toolFolder.add(params, "snap")
+    .name("snap (" + settings.transformation.TOGGLE_SNAP + ")")
+    .onChange(function(value) {
+        if(value) {
+            transformControls.setRotationSnap(45 * Math.PI / 180);
+        }
+        else {
+            transformControls.setRotationSnap(null);
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        if(event.key == settings.transformation.TOGGLE_SNAP) {
+            if(params.snap == false) {
+                params.snap = true;
+                snap.updateDisplay();
+                transformControls.setRotationSnap(45 * Math.PI / 180);
+            }
+            else {
+                params.snap = false;
+                snap.updateDisplay();
+                transformControls.setRotationSnap(null);
+            }
+        }
+    });
+}
+
+function destroyGui(gui) {
+    for(let i = 0; i < gui.controllers.length; i++) {
+        gui.controllers[i].destroy();
+    }
+    gui.destroy();
 }

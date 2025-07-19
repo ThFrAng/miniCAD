@@ -1,3 +1,17 @@
+/*
+        ThFrAng
+        2025
+
+https://github.com/ThFrAng/miniCAD/
+
+powered by georgealways  lil-gui
+https://github.com/georgealways/lil-gui/
+
+for three.js
+https://threejs.org/
+
+*/
+s
 import * as THREE from 'three';
 import settings from './settings.json' with {type: 'json'};
 
