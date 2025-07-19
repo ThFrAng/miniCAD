@@ -81,7 +81,7 @@ export class MiniCAD {
         toolGui = new ToolGui(base, gui);
         base.camera = camera;
         base.scene = scene;
-        base.renderer = renderer;
+        if(renderer != null) {base.renderer = renderer};
 
         const initFolder = gui.addFolder('init');
         const initParams = {
@@ -103,11 +103,8 @@ export class MiniCAD {
         collection.add(mesh, type, name, id);
     }
 
-    addCustom(object, name) {
-        id++;
-        name = "Custom " + name;
-        collection.add(object, 'custom', name);
-        customFolder[id] = gui;
+    renderer(renderer) {
+        base.renderer = renderer;
     }
 }
 
