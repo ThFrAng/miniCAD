@@ -31,7 +31,7 @@ CONSTRUCTOR<br/>
 - camera - three.js camera
 - renderer (optional) - three.js renderer of the scene, need for animation tools, can be add later with a method
 - controls (optional) - three.js controls of the scene, need for animation tools, can be add later with a method
-- <br/><br>
+<br/><br>
 
 METHODS<br/>
 miniCAD.**add(obj, "name");**
