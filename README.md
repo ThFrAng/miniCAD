@@ -9,7 +9,8 @@ for three.js
 https://threejs.org/
 <br/><br/>
 
-![Screenshot miniCAD](https://github.com/user-attachments/assets/6f457069-228d-4f4b-b8f6-b74c5619d8ca)
+<img width="1413" height="721" alt="Screenshot 2025-09-29 105708" src="https://github.com/user-attachments/assets/c0e3f4ff-5b3f-4906-b3e2-349f348cc00b" />
+
 
 
 ```js
