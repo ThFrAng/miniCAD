@@ -1,17 +1,28 @@
 {
+    "HIDE_GUI": "w",
     "USE_POINTERSELECTOR": "true",
     "USE_UPDOWNKEYS": "true",
-    "UPKEY": "ArrowUp",
-    "DOWNKEY": "ArrowDown",
+    "UP_KEY": "ArrowUp",
+    "DOWN_KEY": "ArrowDown",
+    "USE_STATS": "true",
     "transformation" : {
         "_comment": "to use transformation tools, renderer must be past as an argument at initialisation",
         "USE_TRANSFORMATION_TOOLS": "true",
-        "EXIT": "e",
+        "LOCK": "e",
         "TOGGLE_TRANSFORMATION": "t",
         "TOGGLE_TRANSLATE": "d",
         "TOGGLE_SCALE": "f",
         "TOGGLE_ROTATE": "g",
-        "TOGGLE_SNAP": "s"
+        "TOGGLE_SNAP": "s",
+        "HISTORYSIZE": "5",
+        "UNDO_KEY": "z",
+        "REDO_KEY": "x"
+    },
+    "animation": {
+        "PREVIOUS_KEY": "ArrowLeft",
+        "NEXT_KEY": "ArrowRight",
+        "STOPANIMATION_KEY": "s"
+
     }
     
 }

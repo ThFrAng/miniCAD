@@ -1,0 +1,358 @@
+/*
+        ThFrAng
+        2025
+
+https://github.com/ThFrAng/miniCAD/
+
+powered by georgealways  lil-gui
+https://github.com/georgealways/lil-gui/
+
+for three.js
+https://threejs.org/
+
+*/
+
+import * as THREE from 'three';
+import settings from '../settings.json' with {type: 'json'};
+
+export class AnimationPath {
+   type = "Animation Path";
+
+    constructor(
+        scene, 
+        points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 2, 0), new THREE.Vector3(2, 2, 0)], 
+        color = new THREE.Color({color: 0xffffff})) {
+
+        this.scene = scene;
+        if(color != null) 
+        this.color = color;
+        if(points != null) {this.points = points;}
+        else {this.points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];}
+
+        this.selectedPoint = 0;
+        
+        this.path;
+        this.pathObject = new THREE.Line;
+        this.scene.add(this.pathObject);
+        this.cubePoint = new THREE.Mesh;
+
+        this.linkedObject;
+        this.tangentOrientation = true;
+
+        this.update();
+    }
+
+    update() {
+        this.path = new THREE.CatmullRomCurve3(this.points, false);
+        
+        const pathGeometry = new THREE.BufferGeometry().setFromPoints(this.path.getPoints(this.points.length * 20));
+        const pathMaterial = new THREE.LineBasicMaterial({color: this.color});
+        this.pathObject.geometry = pathGeometry;
+        this.pathObject.material = pathMaterial;
+
+        this.cubePoint.geometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
+        this.cubePoint.material = new THREE.MeshBasicMaterial({color: this.color});
+        this.cubePoint.position.copy(this.points[this.selectedPoint]);
+        this.scene.add(this.cubePoint);
+    }
+
+    setSelectedPoint(id) {
+        if(id != null) {
+            if(id >= 0 && id < this.points.length) {
+                this.selectedPoint = id;
+            }
+        }
+        return this.selectedPoint;
+    }
+
+    addPoint() {
+        const newPoint = new THREE.Vector3(this.points[this.selectedPoint].x, this.points[this.selectedPoint].y, this.points[this.selectedPoint].z);
+        this.selectedPoint++;
+
+        this.points.splice(this.selectedPoint, 0, newPoint);
+    }
+
+    removePoint() {
+        this.points.splice(this.selectedPoint, 1);
+        this.selectedPoint--;
+    }
+}
+
+
+
+
+
+
+
+
+const base = {};
+const x = {
+    x: 0,
+    x0: null,
+    play: false
+};
+const animations = [];
+
+
+export class AnimationPathGui {
+    constructor(folder, path, toolGui, collection) {
+        base.path = path;
+        base.folder = folder;
+        base.collection = collection;
+
+        openFolder2(folder[2], path, toolGui);
+        openFolder3(folder[3], path);
+        openFolder4(folder[4], path);
+        openFolder5(folder[5], path);
+
+        let opened = true;
+        
+        shortcuts(path, folder[2], opened);
+    }
+
+    animate() {
+        animate();
+    }
+}
+
+
+//2
+function openFolder2(folder, path, toolGui) {
+
+    const pointMoving = false;
+
+    folder.show();
+    const params = {
+        addPoint: function() {
+            addPoint(path);
+            moveCtrl.name("move " + path.setSelectedPoint());
+        },
+        removePoint: function() {
+            removePoint(path);
+            moveCtrl.name("move " + path.setSelectedPoint());
+        },
+        previousPoint: function() {
+            previousPoint(path);
+            moveCtrl.name("move " + path.setSelectedPoint());
+        },
+        nextPoint: function() {
+            nextPoint(path);
+            moveCtrl.name("move " + path.setSelectedPoint());
+        },
+        move: function() {
+            if(pointMoving == false) {
+                const object = { //structure is the same as normal objects
+                    mesh: path.getCube(),
+                    type: "Point",
+                    gui: {
+                        isMesh: true,
+                        hasShadow: false,
+                        isMoveable: true
+                    }
+                };
+                toolGui.attachObject(object, false);
+                moveButton.name("confirm");
+                pointMoving = true;
+            }
+            else {
+                const point  = new THREE.Vector3(path.getCube().position.x, path.getCube().position.y, path.getCube().position.z);
+                path.getPoints()[path.setSelectedPoint()] = point;
+
+                toolGui.attachObject(null);
+                changePoint(path.setSelectedPoint());
+                moveCtrl.name("move " + path.setSelectedPoint());
+                pointMoving = false;
+            }
+        }
+    };
+
+    folder.add(params, 'addPoint').name("+");
+    folder.add(params, 'removePoint').name("-");
+    folder.add(params, 'previousPoint').name("<<");
+    folder.add(params, 'nextPoint').name(">>");
+    const moveCtrl = folder.add(params, 'move').name("move " + path.setSelectedPoint());
+
+    folder.domElement.children[1].style.display = "flex";
+    folder.domElement.children[1].style.flexWrap = "wrap";
+    folder.controllers[0].domElement.style.flex = "1 0 50%";
+    folder.controllers[1].domElement.style.flex = "1 0 50%";
+    folder.controllers[2].domElement.style.flex = "1 0 50%";
+    folder.controllers[3].domElement.style.flex = "1 0 50%";
+    folder.controllers[4].domElement.style.flex = "1 0 100%";
+}
+
+//3
+function openFolder3(folder, path) {
+
+    folder.show();
+    const params = {
+        position_x: path.points[path.setSelectedPoint()].x,
+        position_y: path.points[path.setSelectedPoint()].y,
+        position_z: path.points[path.setSelectedPoint()].z
+    };
+
+    folder.add(params, 'position_x').onChange(function(value) {
+        path.points[path.setSelectedPoint()].x = value;
+        path.update();
+    });
+    folder.add(params, 'position_y').onChange(function(value) {
+        path.points[path.setSelectedPoint()].y = value;
+        path.update();
+    });
+    folder.add(params, 'position_z').onChange(function(value) {
+        path.points[path.setSelectedPoint()].z = value;
+        path.update();
+    });
+}
+
+//4
+function openFolder4(folder, path) {
+
+    folder.show();
+    const params = {
+        play: function() {
+            x.play = true;
+            pauseCtrl.enable();
+            playCtrl.disable();
+        },
+        pause: function() {
+            x.play = false;
+            playCtrl.enable();
+            pauseCtrl.disable();
+        },
+        stop: function() {
+            x.play = false
+            path.linkedObject.mesh.position.copy(path.path.getPointAt(0));
+            x.x = 0;
+            playCtrl.enable();
+            pauseCtrl.disable();
+        }
+    }
+
+    const playCtrl = folder.add(params, 'play').name("▶");
+    const pauseCtrl = folder.add(params, 'pause').name("⏸︎");
+    const stopCtrl = folder.add(params, 'stop').name("⏹");
+
+    playCtrl.domElement.childNodes[0].children[0].style.color = "green";
+    stopCtrl.domElement.childNodes[0].children[0].style.color = "red";
+}
+
+//5
+function openFolder5(folder, path) {
+
+    folder.show();
+    const params = {
+        object: "Select animated object",
+        tangent: true
+    };
+
+    folder.add(params, 'object', base.collection.getNames()).onChange(function(value) {
+        path.linkedObject = base.collection.getObject(value);
+    });
+    folder.add(params, 'tangent').name("Tangent orientation").onChange(function(value) {
+        path.tangentOrientation = value;
+    });
+}
+
+
+
+
+
+
+
+
+//2
+function addPoint(path) {
+    path.addPoint();
+    path.update();
+    updatePosition();
+}
+
+function removePoint(path) {
+    path.removePoint();
+    path.update();
+    updatePosition();
+}
+
+function previousPoint(path) {
+    path.setSelectedPoint(path.setSelectedPoint() - 1);
+    path.update();
+    updatePosition();
+}
+
+function nextPoint(path) {
+    path.setSelectedPoint(path.setSelectedPoint() + 1);
+    path.update();
+    updatePosition();
+}
+
+function changePoint(id) {
+    const points = selectedPaths.getPoints();
+    pointsParams.position_x = points[id].x;
+    pointsParams.position_y = points[id].y;
+    pointsParams.position_z = points[id].z;
+
+    positionX.updateDisplay();
+    positionY.updateDisplay();
+    positionZ.updateDisplay();
+
+    selectedPaths.update();
+};
+
+//3
+function updatePosition() {
+
+    base.folder[3].controllers[0].object.position_x = base.path.points[base.path.setSelectedPoint()].x;
+    base.folder[3].controllers[0].object.position_y = base.path.points[base.path.setSelectedPoint()].y;
+    base.folder[3].controllers[0].object.position_z = base.path.points[base.path.setSelectedPoint()].z;
+
+    for(let i = 0; i < base.folder[3].controllers.length; i++) {
+        base.folder[3].controllers[i].updateDisplay();
+    }
+}
+
+
+
+
+//shortcuts
+function shortcuts(path, folder2, opened) {
+        document.addEventListener('keydown', function shortcut(event) {
+        if(!opened) {
+            document.removeEventListener('keydown', shortcut);
+        }
+        else if(event.key == settings.animation.PREVIOUS_KEY) {
+            previousPoint(path);
+            updateFolder2()
+        }
+        else if(event.key == settings.animation.NEXT_KEY) {
+            nextPoint(path);
+            updateFolder2();
+        }
+    });
+
+    function updateFolder2() {
+        for(let i = 0; i < folder2.controllers.length; i++) {
+            if(folder2.controllers[i].property == "move") {
+                folder2.controllers[i].name("move " + path.setSelectedPoint());
+            }
+        }
+    }
+}
+
+
+//animation
+function animate() {
+    if(x.play == false) {return 0;}
+    if(x.x0 == null) {x.x0 = x.x;}
+    
+    x.x += 1;
+
+    const t = ((x.x - x.x0) / 2000) % 1;
+    const position = base.path.linkedObject.mesh.position.copy(base.path.path.getPointAt(t));
+
+    if(base.path.tangentOrientation == true) {
+        const tangent = base.path.path.getTangentAt(t).normalize();
+        console.log(tangent);
+        base.path.linkedObject.mesh.lookAt(position.clone().add(tangent));
+    }
+}

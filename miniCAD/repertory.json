@@ -1,0 +1,11 @@
+{
+    "position_x": "position.x",
+    "position_y": "position.y",
+    "position_z": "position.z",
+    "rotation_x": "rotation.x",
+    "rotation_y": "rotation.y",
+    "rotation_z": "rotation.z",
+    "scale_x": "scale.x",
+    "scale_y": "scale.y",
+    "scale_z": "scale.z"
+}
