@@ -21,13 +21,11 @@ export class AnimationPath {
     constructor(
         scene, 
         points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 2, 0), new THREE.Vector3(2, 2, 0)], 
-        color = new THREE.Color({color: 0xffffff})) {
+        color = new THREE.Color("#e0fc0a")) {
 
         this.scene = scene;
-        if(color != null) 
         this.color = color;
-        if(points != null) {this.points = points;}
-        else {this.points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];}
+        this.points = points;
 
         this.selectedPoint = 0;
         
@@ -44,7 +42,7 @@ export class AnimationPath {
 
     update() {
         this.path = new THREE.CatmullRomCurve3(this.points, false);
-        
+
         const pathGeometry = new THREE.BufferGeometry().setFromPoints(this.path.getPoints(this.points.length * 20));
         const pathMaterial = new THREE.LineBasicMaterial({color: this.color});
         this.pathObject.geometry = pathGeometry;

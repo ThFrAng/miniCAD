@@ -21,13 +21,11 @@ export class BasicPath {
     constructor(
         scene, 
         points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 2, 0)], 
-        color = new THREE.Color({color: 0xffffff})) {
+        color = new THREE.Color("#ffffff")) {
 
         this.scene = scene;
-        if(color != null) 
         this.color = color;
-        if(points != null) {this.points = points;}
-        else {this.points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0)];}
+        this.points = points;
 
         this.selectedPoint = 0;
         
