@@ -82,6 +82,7 @@ The "exit" button can helped to relock a pointerLockControls if used.
 <b>Animation tools<br><br>
 Animation tools are a new and experiemental feature of the miniCAD. It allows you to creates three.js CatmullRomCurve3 paths from a set of points that you
 can create.<br>
+Especially the Camera Heading Path that is still work in progress. <br>
 Renderer and controls are need for those tools. <br><br>
 
 There is three types of paths available :
