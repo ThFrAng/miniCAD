@@ -86,6 +86,7 @@ export class AnimationPath {
 
 
 const base = {};
+const ctrl3 = {};
 const x = {
     x: 0,
     x0: null,
@@ -119,7 +120,7 @@ export class AnimationPathGui {
 //2
 function openFolder2(folder, path, toolGui) {
 
-    const pointMoving = false;
+    let pointMoving = false;
 
     folder.show();
     const params = {
@@ -142,7 +143,7 @@ function openFolder2(folder, path, toolGui) {
         move: function() {
             if(pointMoving == false) {
                 const object = { //structure is the same as normal objects
-                    mesh: path.getCube(),
+                    mesh: path.cubePoint,
                     type: "Point",
                     gui: {
                         isMesh: true,
@@ -151,15 +152,26 @@ function openFolder2(folder, path, toolGui) {
                     }
                 };
                 toolGui.attachObject(object, false);
-                moveButton.name("confirm");
+                moveCtrl.name("confirm");
                 pointMoving = true;
             }
             else {
-                const point  = new THREE.Vector3(path.getCube().position.x, path.getCube().position.y, path.getCube().position.z);
-                path.getPoints()[path.setSelectedPoint()] = point;
+                const point  = new THREE.Vector3(path.cubePoint.position.x, path.cubePoint.position.y, path.cubePoint.position.z);
+                path.points[path.setSelectedPoint()] = point;
 
                 toolGui.attachObject(null);
-                changePoint(path.setSelectedPoint());
+                                
+                const points = base.path.path.points;
+                ctrl3.params.position_x = points[base.path.setSelectedPoint()].x;
+                ctrl3.params.position_y = points[base.path.setSelectedPoint()].y;
+                ctrl3.params.position_z = points[base.path.setSelectedPoint()].z;
+
+                ctrl3.ctrlPositionX.updateDisplay();
+                ctrl3.ctrlPositionY.updateDisplay();
+                ctrl3.ctrlPositionZ.updateDisplay();
+
+                base.path.update();
+
                 moveCtrl.name("move " + path.setSelectedPoint());
                 pointMoving = false;
             }
@@ -191,18 +203,20 @@ function openFolder3(folder, path) {
         position_z: path.points[path.setSelectedPoint()].z
     };
 
-    folder.add(params, 'position_x').onChange(function(value) {
+    ctrl3.ctrlPositionX = folder.add(params, 'position_x').onChange(function(value) {
         path.points[path.setSelectedPoint()].x = value;
         path.update();
     });
-    folder.add(params, 'position_y').onChange(function(value) {
+    ctrl3.ctrlPositionY = folder.add(params, 'position_y').onChange(function(value) {
         path.points[path.setSelectedPoint()].y = value;
         path.update();
     });
-    folder.add(params, 'position_z').onChange(function(value) {
+    ctrl3.ctrlPositionZ = folder.add(params, 'position_z').onChange(function(value) {
         path.points[path.setSelectedPoint()].z = value;
         path.update();
     });
+
+    ctrl3.params = params;
 }
 
 //4
@@ -285,19 +299,6 @@ function nextPoint(path) {
     path.update();
     updatePosition();
 }
-
-function changePoint(id) {
-    const points = selectedPaths.getPoints();
-    pointsParams.position_x = points[id].x;
-    pointsParams.position_y = points[id].y;
-    pointsParams.position_z = points[id].z;
-
-    positionX.updateDisplay();
-    positionY.updateDisplay();
-    positionZ.updateDisplay();
-
-    selectedPaths.update();
-};
 
 //3
 function updatePosition() {

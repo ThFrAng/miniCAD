@@ -14,6 +14,7 @@
         "TOGGLE_SCALE": "f",
         "TOGGLE_ROTATE": "g",
         "TOGGLE_SNAP": "s",
+        "TOGGLE_CENTER": "c",
         "HISTORYSIZE": "5",
         "UNDO_KEY": "z",
         "REDO_KEY": "x"

@@ -14,9 +14,9 @@ https://threejs.org/
 
 import * as THREE from 'three';
 import {GUI} from 'three/addons/libs/lil-gui.module.min.js';
-import {BasicPathGui} from './BasicPath.js';
-import {AnimationPathGui} from './AnimationPath.js';
-import {CameraTravellingPathGui} from './CameraTravellingPath.js';
+import {BasicPath, BasicPathGui} from './BasicPath.js';
+import {AnimationPath, AnimationPathGui} from './AnimationPath.js';
+import {CameraTravellingPath, CameraTravellingPathGui} from './CameraTravellingPath.js';
 import {AddPathGui} from './AddPathGui.js';
 
 const folder = [];
@@ -30,13 +30,14 @@ let pathGui;
 let pathPicker, pathName, pathType;
 
 export class AnimationGui {
-    constructor(base, _toolGui) {
+    constructor(base, _toolGui, importPoints) {
         const scene = base.scene;
         camera = base.camera;
         toolGui = _toolGui;
         collection = base.collection
 
         openGui(scene);
+        if(importPoints != null) {importPath(importPoints, scene);}
     }
 
     animate() {
@@ -142,14 +143,6 @@ function updatePathPicker() {
 }
 
 function exportPaths() {
-    // let save = "const points = [\n";
-    // const mainPoints = mainPath.getPoints();
-    
-    // for(let i = 0; i < mainPoints.length; i++) {
-    //     save += "   new THREE.Vector3(" + mainPoints[i].x + ", " + mainPoints[i].y + ", " + mainPoints[i].z + "),\n";
-    // }
-    // save += "];"
-    // console.log(save);
 
     console.log(paths.name);
     for(let i = 0; i < paths.name.length; i++) {
@@ -233,4 +226,33 @@ function pickPath(value) {
     else if(selectedPath[0].type == "Camera Travelling Path") {
         pathGui = new CameraTravellingPathGui(folder, selectedPath[0], toolGui, collection, camera);
     }
+}
+
+
+function importPath(importPoints, scene) {
+    for(let i = 0; i < importPoints.length; i++) {
+
+        let idName = 0;
+        let name = importPoints[i].type;
+        let newName = name;
+
+        while(paths.name.includes(newName)) {
+            idName ++;
+            newName = name + idName;
+        }
+            
+        if(importPoints[i].type == "Basic Path") {
+            paths.path.push(new BasicPath(scene, importPoints[i].points));
+            paths.name.push(newName);
+        }
+        else if(importPoints[i].type == "Animation Path") {
+            paths.path.push(new AnimationPath(scene, importPoints[i].points));
+            paths.name.push(newName);
+        }
+        else if(importPoints[i].type == "Camera Travelling Path") {
+            paths.path.push(new CameraTravellingPath(scene, importPoints[i].points, importPoints[i].secondaryPoints));
+            paths.name.push(newName);
+        }
+    }
+    updatePathPicker();
 }

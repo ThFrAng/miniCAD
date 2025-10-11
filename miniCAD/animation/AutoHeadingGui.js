@@ -50,7 +50,7 @@ export class AutoHeadingGui {
         };
 
         autoHeadingGui.add(params, 'close');
-        const warningCtrl = autoHeadingGui.add(params, 'warning').name("Warning: <br>Can only be used with Lock Controls Camera").disable();
+        const warningCtrl = autoHeadingGui.add(params, 'warning').name("Warning: <br>Can only be used with Pointer Lock Controls Camera").disable();
         autoHeadingGui.add(params, 'start');
         autoHeadingGui.add(params, 'stop').name("stop: use shortcut (" + settings.animation.STOPANIMATION_KEY + ")").disable();
     

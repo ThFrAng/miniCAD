@@ -18,7 +18,7 @@ import {TransformControls} from 'three/addons/controls/TransformControls.js';
 import settings from './settings.json' with {type: 'json'};
 
 let base, gui, guiTools, transformControls, toolFolder;
-let transformationButton, translateButton, scaleButton, rotationButton;
+let transformationButton, translateButton, scaleButton, rotationButton, centerButton;
 let selectedObject = 0;
 let updatable = true;
 
@@ -199,17 +199,17 @@ export class ToolGui {
                 }
             },
             scale: function() {
-                if(optionsParams.transformation == true && selectedObject.type == 'Mesh') {
+                if(optionsParams.transformation == true && selectedObject.gui.isMesh == true) {
                     destroyGui(toolFolder);
                     enableScale();
                 }
             },
             rotation: function() {
-                if(optionsParams.transformation == true && selectedObject.type == 'Mesh') {
+                if(optionsParams.transformation == true && selectedObject.gui.isMesh == true) {
                     destroyGui(toolFolder);
                     enableRotate();
                 }
-            }
+            },
         }
         translateButton = transformationFolder.add(transformationParams, 'translate')
         .name("✥ (" + settings.transformation.TOGGLE_TRANSLATE + ")");
@@ -223,17 +223,22 @@ export class ToolGui {
                 destroyGui(toolFolder);
                 enableTranslate();
             }
-            else if(event.key == settings.transformation.TOGGLE_SCALE && optionsParams.transformation == true && selectedObject.type == 'Mesh') {
+            else if(event.key == settings.transformation.TOGGLE_SCALE && optionsParams.transformation == true && selectedObject.gui.isMesh == true) {
                 destroyGui(toolFolder);
                 enableScale();
             }
-            else if(event.key == settings.transformation.TOGGLE_ROTATE && optionsParams.transformation == true && selectedObject.type == 'Mesh') {
+            else if(event.key == settings.transformation.TOGGLE_ROTATE && optionsParams.transformation == true && selectedObject.gui.isMesh == true) {
                 destroyGui(toolFolder);
                 enableRotate();
             }
+            
+            else if(event.key == settings.transformation.TOGGLE_CENTER && optionsParams.transformation == true && selectedObject.gui.isMesh == true) {
+                destroyGui(toolFolder);
+                enableCenter();
+            }
         });
 
-        transformControls.addEventListener( 'mouseUp', function ( event ) {
+        transformControls.addEventListener('mouseUp', function (event) {
             updateObject();
             history.saveHistory(selectedObject);
         } );
@@ -252,18 +257,16 @@ export class ToolGui {
     }
 
     attachObject(object, update) {
-        if(object != null) {
-            if(object.gui.isMoveable) {
-                selectedObject = object;
-                if(update != null) {updatable = update;}
+        if(object != null && object.gui.isMoveable) {
+            selectedObject = object;
+            if(update != null) {updatable = update;}
 
-                destroyGui(toolFolder);
-            
-                transformControls.attach(selectedObject.mesh);
-                transformationButton.enable();
-                enableTranslate();
-                history.saveHistory(selectedObject);
-            }
+            destroyGui(toolFolder);
+        
+            transformControls.attach(selectedObject.mesh);
+            transformationButton.enable();
+            enableTranslate();
+            history.saveHistory(selectedObject);
         }
         else {
             transformControls.detach();
@@ -284,7 +287,7 @@ function updateObject() {
             gui.folders[1].controllers[3].updateDisplay();
             
 
-            if(selectedObject.type == 'Mesh') {
+            if(selectedObject.gui.isMesh == true) {
                 gui.folders[1].controllers[0].object.scale_x = selectedObject.mesh.scale.x;
                 gui.folders[1].controllers[0].object.scale_y = selectedObject.mesh.scale.y;
                 gui.folders[1].controllers[0].object.scale_z = selectedObject.mesh.scale.z;

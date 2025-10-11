@@ -101,7 +101,7 @@ export class SpotLight extends Light {
         elementFolder.add(params, 'intensity').onChange(function(value) {
             object.mesh.intensity = value;
         });
-        elementFolder.add(params, 'decay', 0, 1).onChange(function(value) {
+        elementFolder.add(params, 'decay').onChange(function(value) {
             object.mesh.decay = value;
             helper.update();
         });
@@ -137,8 +137,6 @@ export class SpotLight extends Light {
         });
         const helperFolder = elementFolder.addFolder('helper');
         helperFolder.add(helper, 'visible');
-    
-        return elementFolder;
     }
 
     destroy() {

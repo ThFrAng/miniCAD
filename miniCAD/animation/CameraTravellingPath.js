@@ -137,7 +137,7 @@ export class CameraTravellingPathGui {
 
         openFolder2(folder[2], path, toolGui);
         openFolder3(folder[3], path);
-        openFolder4(folder[4], path);
+        openFolder4(folder[4]);
         openFolder5(folder[5], path);
 
         let opened = true;
@@ -154,7 +154,7 @@ export class CameraTravellingPathGui {
 //2
 function openFolder2(folder, path, toolGui) {
 
-    let pointMoving = false; //
+    let pointMoving = false;
 
     folder.show();
     const params = {
@@ -177,7 +177,7 @@ function openFolder2(folder, path, toolGui) {
         move: function() {
             if(pointMoving == false) {
                 const object = { //structure is the same as normal objects
-                    mesh: path.cubePoint, //
+                    mesh: path.cubePoint,
                     type: "Point",
                     gui: {
                         isMesh: true,
@@ -186,14 +186,14 @@ function openFolder2(folder, path, toolGui) {
                     }
                 };
                 toolGui.attachObject(object, false);
-                moveCtrl.name("confirm"); //
+                moveCtrl.name("confirm");
                 pointMoving = true;
             }
             else {
-                const point  = new THREE.Vector3(path.cubePoint.position.x, path.cubePoint.position.y, path.cubePoint.position.z); //
+                const point  = new THREE.Vector3(path.cubePoint.position.x, path.cubePoint.position.y, path.cubePoint.position.z);
                 path.points[path.setSelectedPoint()] = point;
 
-                toolGui.attachObject(null); //
+                toolGui.attachObject(null);
                 
                 const points = base.path.path.points;
                 ctrl3.params.position_x = points[base.path.setSelectedPoint()].x;
@@ -206,7 +206,7 @@ function openFolder2(folder, path, toolGui) {
 
                 base.path.update();
 
-                moveCtrl.name("move " + base.path.setSelectedPoint()); //
+                moveCtrl.name("move " + base.path.setSelectedPoint());
                 pointMoving = false;
             }
         }
@@ -250,11 +250,11 @@ function openFolder3(folder, path) {
         path.update();
     });
 
-    ctrl3.params = params
+    ctrl3.params = params;
 }
 
 //4
-function openFolder4(folder, path) {
+function openFolder4(folder) {
 
     folder.show();
     const params = {
@@ -270,7 +270,6 @@ function openFolder4(folder, path) {
         },
         stop: function() {
             x.play = false
-            path.linkedObject.mesh.position.copy(path.path.getPointAt(0));
             x.x = 0;
             playCtrl.enable();
             pauseCtrl.disable();

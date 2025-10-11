@@ -33,6 +33,9 @@ let id = 0;
 
 let base = {guis: guis};
 
+let importPoints = [];
+
+
 class Collection {
 
     getObject(name) {
@@ -136,6 +139,13 @@ export class MiniCAD {
     controls(controls) {
         base.controls = controls;
     }
+    
+    addPath(type, points, secondaryPoints) {
+        if(type == 'Basic Path') {importPoints.push({type, points});}
+        else if(type == 'Animation Path') {importPoints.push({type, points});}
+        else if(type == 'Camera Travelling Path') {importPoints.push({type, points, secondaryPoints});}
+        else {console.error("unknown path type");}
+    }
 }
 
 function load(gui, base) {
@@ -145,7 +155,7 @@ function load(gui, base) {
 
     const headerParams = {
         animation: function() {
-            animationGui = new AnimationGui(base, toolGui);
+            animationGui = new AnimationGui(base, toolGui, importPoints);
             gui[3] = animationGui;
         },
         save: function() {
@@ -201,8 +211,9 @@ function load(gui, base) {
 
         elementFolder = new DataGui(base, gui, selectedObject);
         selectedObject.gui = elementFolder;
-        console.log(elementFolder);
+
         toolGui.attachObject(selectedObject, true);
+
         oldFolder.destroy();
     });
     const locateButton = headerFolder.add(headerParams, 'locate').name('locate');

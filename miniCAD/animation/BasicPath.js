@@ -145,7 +145,7 @@ function openFolder2(folder, path, toolGui) {
             }
             else {
                 const point  = new THREE.Vector3(path.cubePoint.position.x, path.cubePoint.position.y, path.cubePoint.position.z);
-                path.getPoints()[path.setSelectedPoint()] = point;
+                path.points[path.setSelectedPoint()] = point;
 
                 toolGui.attachObject(null);
                 
@@ -191,18 +191,20 @@ function openFolder3(folder, path) {
         position_z: path.points[path.setSelectedPoint()].z
     };
 
-    folder.add(params, 'position_x').onChange(function(value) {
+    ctrl3.ctrlPositionX = folder.add(params, 'position_x').onChange(function(value) {
         path.points[path.setSelectedPoint()].x = value;
         path.update();
     });
-    folder.add(params, 'position_y').onChange(function(value) {
+    ctrl3.ctrlPositionY = folder.add(params, 'position_y').onChange(function(value) {
         path.points[path.setSelectedPoint()].y = value;
         path.update();
     });
-    folder.add(params, 'position_z').onChange(function(value) {
+    ctrl3.ctrlPositionZ = folder.add(params, 'position_z').onChange(function(value) {
         path.points[path.setSelectedPoint()].z = value;
         path.update();
     });
+
+    ctrl3.params = params;
 }
 
 
