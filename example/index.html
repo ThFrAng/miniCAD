@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+    <head>
+		<title>MiniCAD</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <link type="text/css" rel="stylesheet" href="main.css">
+    </head>
+    <body>
+
+		<!-- Import maps polyfill -->
+		<!-- Remove this when import maps will be widely supported -->
+		<script async src="https://unpkg.com/es-module-shims@1.3.6/dist/es-module-shims.js"></script>
+
+		<script type="importmap">
+			{
+				"imports": {
+					"three": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.module.js",
+                    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.173.0/examples/jsm/",
+					"miniCAD": "./miniCAD/miniCAD.js"
+				}
+			}
+		</script>
+
+		<script type="module">
+            import * as THREE from 'three';
+            import {MiniCAD} from 'miniCAD';
+            import {OrbitControls} from 'three/addons/controls/OrbitControls.js';
+            import {PointerLockControls} from 'three/addons/controls/PointerLockControls.js';
+            
+            let renderer, scene, camera;
+
+            function init() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+                
+                renderer = new THREE.WebGLRenderer({antialias: true});
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                renderer.shadowMap.enabled = true;
+                document.body.appendChild(renderer.domElement);
+                window.addEventListener('resize', onWindowResize);
+
+                const controls = new OrbitControls(camera, renderer.domElement);
+                controls.addEventListener( 'change', render );
+                // const controls = new PointerLockControls(camera, document.body);
+
+                //
+
+                const miniCAD = new MiniCAD(scene, camera, controls, renderer);
+
+                const light = new THREE.DirectionalLight(0xffffff, 1);
+                scene.add(light);
+                miniCAD.add(light, "Main Light");
+
+                const light2 = new THREE.SpotLight(0xffff00, 1.7);
+                light2.position.set(1, 1, 0);
+                scene.add(light2);
+                miniCAD.add(light2, "SpotLight");
+
+                const cube = new THREE.Mesh(new THREE.BoxGeometry(1, 1, 1), new THREE.MeshStandardMaterial({color: 0x00ffff}));
+                cube.castShadow = true;
+                scene.add(cube);
+                miniCAD.add(cube, "Cube");
+
+                const floor = new THREE.Mesh(new THREE.PlaneGeometry(5, 5), new THREE.MeshStandardMaterial({color: 0xb2b2b2}));
+                floor.receiveShadow = true;
+                floor.position.set(0, -1, 0);
+                floor.rotation.x = -Math.PI / 2;
+                scene.add(floor);
+                miniCAD.add(floor, "Floor");
+
+                camera.position.set(0, 3, 3);
+                camera.lookAt(0, 0, 0);
+
+                const path1 = [
+                    new THREE.Vector3(1, 0, 0),
+                    new THREE.Vector3(2, 1, 0),
+                    new THREE.Vector3(2, 2, 0)
+                ];
+
+                const path2 = [
+                    new THREE.Vector3(0, 0, 0),
+                    new THREE.Vector3(0, 1, 0),
+                    new THREE.Vector3(2, 2, 2)
+                ]
+
+                miniCAD.addPath("Basic Path", path1);
+                miniCAD.addPath("Animation Path", path2);
+
+            }
+
+            function onWindowResize() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                render();
+            }
+
+            function render() {
+                renderer.render(scene, camera);
+            }
+
+            init();
+            animate();
+        </script>
+    </body>
+</html>
