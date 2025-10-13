@@ -25,12 +25,18 @@ const miniCAD = new MiniCAD(scene, camera);
 miniCAD.add(box, "Box 1");
 ```
 <br/><br/>
+**GETTING STARTED**<br/>
+Copy the <i>miniCAD</i> folder in your projet, then import MiniCAD : ``` import {MiniCAD} from './miniCAD/miniCAD.js'; ``` <br>
+Create a new instance of the miniCAD : ``` const miniCAD = new MiniCAD(scene, camera); ``` <br>
+Start to add objects you want to adjust : ``` miniCAD.add(box, "Box 1"); ``` <br>
+To use the animation tools add the renderer to the declaration ``` const miniCAD = new MiniCAD(scene, camera, renderer); ```<br>
+
+<br/><br/>
 CONSTRUCTOR<br/>
-**MiniCAD(scene, camera, renderer, controls)**
+**MiniCAD(scene, camera, renderer)**
 - scene - three.js scene
 - camera - three.js camera
 - renderer (optional) - three.js renderer of the scene, need for animation tools, can be add later with a method
-- controls (optional) - three.js controls of the scene, need for animation tools, can be add later with a method
 <br/><br>
 
 METHODS<br/>
@@ -83,7 +89,7 @@ The "exit" button can helped to relock a pointerLockControls if used.
 Animation tools are a new and experiemental feature of the miniCAD. It allows you to creates three.js CatmullRomCurve3 paths from a set of points that you
 can create.<br>
 Especially the Camera Heading Path that is still work in progress. <br>
-Renderer and controls are need for those tools. <br><br>
+Renderer is needed for these tools. <br><br>
 
 There is three types of paths available :
 - BasicPath : is a simple path
