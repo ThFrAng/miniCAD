@@ -23,20 +23,21 @@ const folder = [];
 let opened = false;
 
 const paths = {name: [], path: []};
-let toolGui, collection, camera;
+let guis, toolGui, collection, camera;
 let animationGui;
 let selectedPath;
 let pathGui;
 let pathPicker, pathName, pathType;
 
 export class AnimationGui {
-    constructor(base, _toolGui, importPoints) {
+    constructor(base, _guis, importPoints) {
         const scene = base.scene;
         camera = base.camera;
-        toolGui = _toolGui;
+        guis = _guis;
+        toolGui = guis[1];
         collection = base.collection
 
-        openGui(scene);
+        if(opened == false) {openGui(scene);}
         if(importPoints != null) {importPath(importPoints, scene);}
     }
 
@@ -47,6 +48,7 @@ export class AnimationGui {
 
 
 function openGui(scene) {
+    opened = true;
 
     const width = [window.innerWidth * 0.099, window.innerWidth * 0.201, window.innerWidth * 0.099, 
         window.innerWidth * 0.201, window.innerWidth * 0.055, window.innerWidth * 0.245]
@@ -67,7 +69,8 @@ function openGui(scene) {
             closeGui();
         },
         add_path: function() {
-            new AddPathGui(scene, paths, updatePathPicker);
+            if(guis[10] != null) {guis[10].destroy();}
+            guis[10] = new AddPathGui(scene, paths, updatePathPicker);
         },
         export: function () {
             exportPaths();
@@ -218,13 +221,13 @@ function pickPath(value) {
     pathType.updateDisplay();
 
     if(selectedPath[0].type == "Basic Path") {
-        pathGui = new BasicPathGui(folder, selectedPath[0], toolGui);
+        pathGui = new BasicPathGui(folder, selectedPath[0], camera, toolGui);
     }
     else if(selectedPath[0].type == "Animation Path") {
-        pathGui = new AnimationPathGui(folder, selectedPath[0], toolGui, collection);
+        pathGui = new AnimationPathGui(folder, selectedPath[0], camera, toolGui, collection);
     }
     else if(selectedPath[0].type == "Camera Travelling Path") {
-        pathGui = new CameraTravellingPathGui(folder, selectedPath[0], toolGui, collection, camera);
+        pathGui = new CameraTravellingPathGui(folder, selectedPath[0], guis, collection, camera);
     }
 }
 

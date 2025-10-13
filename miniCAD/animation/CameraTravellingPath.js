@@ -123,19 +123,20 @@ const x = {
     x0: null,
     play: false
 };
-const animations = [];
 const ctrl3 = {};
 let autoHeading;
 
 
 export class CameraTravellingPathGui {
-    constructor(folder, path, toolGui, collection, camera) {
+    constructor(folder, path, guis, collection, camera) {
         base.path = path;
         base.folder = folder;
         base.collection = collection;
         base.camera = camera;
+        base.guis = guis;
+        const toolGui = guis[1];
 
-        openFolder2(folder[2], path, toolGui);
+        openFolder2(folder[2], path, camera, toolGui);
         openFolder3(folder[3], path);
         openFolder4(folder[4]);
         openFolder5(folder[5], path);
@@ -152,7 +153,7 @@ export class CameraTravellingPathGui {
 
 
 //2
-function openFolder2(folder, path, toolGui) {
+function openFolder2(folder, path, camera, toolGui) {
 
     let pointMoving = false;
 
@@ -196,19 +197,17 @@ function openFolder2(folder, path, toolGui) {
                 toolGui.attachObject(null);
                 
                 const points = base.path.path.points;
-                ctrl3.params.position_x = points[base.path.setSelectedPoint()].x;
-                ctrl3.params.position_y = points[base.path.setSelectedPoint()].y;
-                ctrl3.params.position_z = points[base.path.setSelectedPoint()].z;
-
-                ctrl3.ctrlPositionX.updateDisplay();
-                ctrl3.ctrlPositionY.updateDisplay();
-                ctrl3.ctrlPositionZ.updateDisplay();
-
+                updatePosition();
                 base.path.update();
 
                 moveCtrl.name("move " + base.path.setSelectedPoint());
                 pointMoving = false;
             }
+        },
+        move_to_camera: function() {
+            path.points[path.setSelectedPoint()].copy(camera.position);
+            updatePosition();
+            path.update();
         }
     };
 
@@ -217,6 +216,7 @@ function openFolder2(folder, path, toolGui) {
     folder.add(params, 'previousPoint').name("<<");
     folder.add(params, 'nextPoint').name(">>");
     const moveCtrl = folder.add(params, 'move').name("move " + path.setSelectedPoint());
+    folder.add(params, 'move_to_camera').name("⮕📷");
 
     folder.domElement.children[1].style.display = "flex";
     folder.domElement.children[1].style.flexWrap = "wrap";
@@ -224,7 +224,9 @@ function openFolder2(folder, path, toolGui) {
     folder.controllers[1].domElement.style.flex = "1 0 50%";
     folder.controllers[2].domElement.style.flex = "1 0 50%";
     folder.controllers[3].domElement.style.flex = "1 0 50%";
-    folder.controllers[4].domElement.style.flex = "1 0 100%";
+    folder.controllers[4].domElement.style.flex = "1 0 60%";
+    folder.controllers[5].domElement.style.flex = "1 0 40%";
+    folder.controllers[5].domElement.childNodes[0].children[0].style.color = "blue";
 }
 
 //3
@@ -292,6 +294,9 @@ function openFolder5(folder, path) {
         path: "Choose path : camera",
         auto_heading: function() {
             autoHeading = new AutoHeadingGui(path, base.camera);
+            
+            if(base.guis[10]) {base.guis[10].destroy();}
+            base.guis[10] = autoHeading;
         },
         speed: 0
     };

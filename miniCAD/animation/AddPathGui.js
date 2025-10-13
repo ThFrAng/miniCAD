@@ -24,6 +24,8 @@ export class AddPathGui {
         
         //gui
         const newPathGui = new GUI({title: "New Path", width: 250});
+        this.newPathGui = newPathGui;
+
         newPathGui.domElement.style.left = (window.innerWidth - 250) / 2 + "px";
         newPathGui.domElement.style.top = "300px";
 
@@ -99,5 +101,9 @@ export class AddPathGui {
             //update pick path controller from animation gui
             updatePathPicker();
         }
+    }
+
+    destroy() {
+        this.newPathGui.destroy();
     }
 }

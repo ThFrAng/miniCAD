@@ -23,14 +23,14 @@ export class SaveGui {
     constructor(objects, current) {
         collection = objects;
         selectedObject = current;
-        openGui();
+        
+        this.guiSave = openGui();
     }
 
-    opened() {
-
+    destroy() {
+        opened = false;
+        this.guiSave.destroy();
     }
-
-
 }
 
 
@@ -63,6 +63,10 @@ function openGui() {
         guiSave.add(params, 'save');
         confirmation = guiSave.add(params, 'confirmation').name("");
         confirmation.disable();
+
+        confirmation.domElement.childNodes[0].children[0].style.color = "white";
+
+        return guiSave;
     }
 }
 
@@ -103,7 +107,7 @@ function save(params, confirmation) {
         confirmation.name("Saved as a Js object in the console");
     }
     else if(params.format == "Code" && params.include == "Current") {
-        console.log(save);
+
         console.log(objToCode(save, selectedObject.name));
         confirmation.name("Saved as code in the console");
     }
@@ -120,12 +124,11 @@ function objToCode(save, selectedName) {
             
             const name = save[i].name;
             const parameters = Object.entries(save[i].parameters);
-            console.log(parameters);
+
             for(let i = 0; i < parameters.length; i++) {
                 
                 const rawName = parameters[i][0];
-                console.log(rawName);
-                console.log(Object.keys({rawName}));
+
                 if(selectedName == null) {
                     code += name + "." + names[rawName] + " = " + parameters[i][1] + ";\n";
                 }

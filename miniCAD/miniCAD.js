@@ -24,7 +24,7 @@ import settings from './settings.json' with {type: 'json'};
 
 let objects = [];
 let names = [];
-let guis = []; // 0: main gui; 1: toolGui; 2: info option;
+let guis = []; // 0: main gui; 1: toolGui; 2: info option; 3: animation gui; 10: pop ups
 let toolGui, animationGui;
 
 let bufferCameraPosition = new THREE.Vector3(0, 0, 0);
@@ -69,11 +69,13 @@ class Collection {
 
     saveObject(object, gui) {
         const save = gui.save();
-        if(save.folders.properties.folders.Controls != null) {
-            object.save = save.folders.properties.folders.Controls.controllers;
-        }
-        else {
-            object.save = save.folders.properties.controllers;
+        if(save.controllers.lenght > 0) {
+            if(save.folders.properties.folders.Controls != null) {
+                object.save = save.folders.properties.folders.Controls.controllers;
+            }
+            else {
+                object.save = save.folders.properties.controllers;
+            }
         }
     }
 }
@@ -85,7 +87,7 @@ export class MiniCAD {
         const gui = new GUI({title: 'miniCAD'});
         guis[0] = gui;
         toolGui = new ToolGui(base);
-        guis[1] = toolGui.gui;
+        guis[1] = toolGui;
         animate();
         
         base.camera = camera;
@@ -100,14 +102,16 @@ export class MiniCAD {
                 if(shown == true) {
                     shown = false;
                     guis[0].hide();
-                    guis[1].hide();
+                    guis[1].gui.hide();
                     guis[2].style.display = 'none';
+                    guis[3].gui.hide();
                 }
                 else {
                     shown = true;
                     guis[0].show();
-                    guis[1].show();
+                    guis[1].gui.show();
                     guis[2].style.display = 'flex';
+                    guis[3].gui.hide();
                 }
             }
         })
@@ -155,12 +159,13 @@ function load(gui, base) {
 
     const headerParams = {
         animation: function() {
-            animationGui = new AnimationGui(base, toolGui, importPoints);
-            gui[3] = animationGui;
+            animationGui = new AnimationGui(base, guis, importPoints);
+            guis[3] = animationGui;
         },
         save: function() {
-            const saveGui = new SaveGui(collection, selectedObject);
-            gui[4] = saveGui;
+            if(guis[10] != null) {guis[10].destroy();}
+            guis[10] = new SaveGui(collection, selectedObject);
+            
             collection.saveObject(selectedObject, gui);
         },
         camera_x: base.camera.position.x,

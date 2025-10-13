@@ -32,6 +32,8 @@ export class AutoHeadingGui {
 
         //gui
         const autoHeadingGui = new GUI({title: "Auto Heading", width: 250});
+        this.autoHeadingGui = autoHeadingGui;
+
         autoHeadingGui.domElement.style.left = (window.innerWidth - 250) / 2 + "px";
         autoHeadingGui.domElement.style.top = "300px";
 
@@ -54,7 +56,7 @@ export class AutoHeadingGui {
         autoHeadingGui.add(params, 'start');
         autoHeadingGui.add(params, 'stop').name("stop: use shortcut (" + settings.animation.STOPANIMATION_KEY + ")").disable();
     
-        warningCtrl.domElement.childNodes[0].children[0].style.height = "40px";
+        warningCtrl.domElement.childNodes[0].children[0].style.height = "50px";
         warningCtrl.domElement.childNodes[0].children[0].style.color = "yellow";
     
         document.addEventListener("keydown", function stopKey(event) {
@@ -100,5 +102,9 @@ export class AutoHeadingGui {
             camera.getWorldDirection(target);
             newPoints.push(new THREE.Vector3(camera.position.x + target.x, camera.position.y + target.y, camera.position.z + target.z));
         }
+    }
+
+    destroy() {
+        this.autoHeadingGui.destroy();
     }
 }
