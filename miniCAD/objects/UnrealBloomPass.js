@@ -55,4 +55,13 @@ export class UnrealBloomPass extends Object {
     destroy() {
         this.folder.destroy();
     }
+
+    save(name, parameter) {
+        let code = 
+            name + ".threshold = " + parameter[0][1]['threshold'] + ";\n" +
+            name + ".strength = " + parameter[0][1]['strength'] + ";\n" +
+            name + ".radius = " + parameter[0][1]['radius'] + ";\n";
+
+        return code;
+    }
 }

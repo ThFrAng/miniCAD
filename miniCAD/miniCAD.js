@@ -60,30 +60,33 @@ class Collection {
             mesh: mesh,
             type: mesh.constructor.name,
             name: newName,
-            save: 0
+            save: {}
         }
 
         objects.push(object);
         names.push(newName);
     }
 
-    saveObject(object, gui) {
-        const save = gui.save();
-        if(save.controllers.lenght > 0) {
-            if(save.folders.properties.folders.Controls != null) {
-                object.save = save.folders.properties.folders.Controls.controllers;
-            }
-            else {
-                object.save = save.folders.properties.controllers;
-            }
+    saveObject(object, multiple) {
+        const save = guis[0].save();
+
+        if(multiple == 'light' || (multiple == null && save.folders.properties.controllers["light / shadow"] == 'light')) { //if object folder switches from light to shadow or if normal save but its a multiple folder object
+            object.save.light = save.folders.properties.controllers;
+        }
+        else if(multiple == 'shadow' || (multiple == null && save.folders.properties.controllers["light / shadow"] == 'shadow')) {
+            object.save.shadow = save.folders.properties.controllers;
+        }
+        else {
+            object.save.main = save.folders.properties.controllers;
         }
     }
 }
 const collection = new Collection();
+base.collection = collection;
 
 
 export class MiniCAD {
-    constructor(scene, camera, renderer, controls) {
+    constructor(scene, camera, controls, renderer) {
         const gui = new GUI({title: 'miniCAD'});
         guis[0] = gui;
         toolGui = new ToolGui(base);
@@ -166,7 +169,7 @@ function load(gui, base) {
             if(guis[10] != null) {guis[10].destroy();}
             guis[10] = new SaveGui(collection, selectedObject);
             
-            collection.saveObject(selectedObject, gui);
+            collection.saveObject(selectedObject);
         },
         camera_x: base.camera.position.x,
         camera_y: base.camera.position.y,
@@ -208,7 +211,7 @@ function load(gui, base) {
     headerFolder.add(headerParams, 'object', collection.getNames()).name('object').onChange(function(value) {
         
         if(selectedObject != 0) {
-            collection.saveObject(selectedObject, gui);
+            collection.saveObject(selectedObject);
         }
 
         selectedObject = collection.getObject(value);
@@ -219,7 +222,7 @@ function load(gui, base) {
 
         toolGui.attachObject(selectedObject, true);
 
-        oldFolder.destroy();
+        if(oldFolder != null) {oldFolder.destroy();}
     });
     const locateButton = headerFolder.add(headerParams, 'locate').name('locate');
 }

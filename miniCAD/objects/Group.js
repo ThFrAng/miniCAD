@@ -84,12 +84,18 @@ export class Group {
         
         return elementFolder;
     }
-
-    update() {
-
-    }
     
     destroy() {
         this.folder.destroy();
+    }
+
+    save(name, parameter) {
+        const code =
+            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
+            name + ".scale.set(" + parameter[0][1]['scale_x'] + ", " + parameter[0][1]['scale_y'] + ", " + parameter[0][1]['scale_z'] + ");\n" +
+            name + ".rotation.set(" + parameter[0][1]['rotation_x'] + ", " + parameter[0][1]['rotation_y'] + ", " + parameter[0][1]['rotation_z'] + ");\n";
+        
+        
+        return code;
     }
 }

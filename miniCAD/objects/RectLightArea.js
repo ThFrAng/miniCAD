@@ -25,9 +25,7 @@ export class RectAreaLight extends Light {
         super.hasShadow = true;
 
         this.elementFolder = gui.addFolder('properties');
-        this.open();
-
-        return this.elementFolder;
+        this.folder = this.open();
     }
 
     open() {
@@ -105,5 +103,17 @@ export class RectAreaLight extends Light {
 
     destroy() {
         this.folder.destroy();
+    }
+
+    save(name, parameter) {
+        let code =
+            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
+            name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
+            name + ".width = " + parameter[0][1]['width'] + ";\n" +
+            name + ".height = " + parameter[0][1]['height'] + ";\n" +
+            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".lookAt(" + parameter[0][1]['target_x'] + ", " + parameter[0][1]['target_y'] + ", " + parameter[0][1]['target_z'] + ");\n";
+
+        return code;
     }
 }

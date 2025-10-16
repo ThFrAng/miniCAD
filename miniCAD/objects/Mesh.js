@@ -93,15 +93,12 @@ export class Mesh extends Object {
         this.folder.destroy();
     }
 
-    names = {
-        "position_x": "position.x",
-        "position_y": "position.y",
-        "position_z": "position.z",
-        "scale_x": "scale.x",
-        "scale_y": "scale.y",
-        "scale_z": "scale.z",
-        "rotation_x": "rotation.x",
-        "rotation_y": "rotation.y",
-        "rotation_z": "rotation.z"
-    };
+    save(name, parameter) {
+        let code =
+            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
+            name + ".scale.set(" + parameter[0][1]['scale_x'] + ", " + parameter[0][1]['scale_y'] + ", " + parameter[0][1]['scale_z'] + ");\n" +
+            name + ".rotation.set(" + parameter[0][1]['rotation_x'] + ", " + parameter[0][1]['rotation_y'] + ", " + parameter[0][1]['rotation_z'] + ");\n";
+        
+        return code;
+    }
 }

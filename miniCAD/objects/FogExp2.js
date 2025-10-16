@@ -51,4 +51,12 @@ export class FogExp2 extends Object {
     destroy() {
         this.folder.destroy();
     }
+
+    save(name, parameter) {
+        let code =
+            name + ".color.setHex('" + parameter[0][1]['color'] + ";\n" +
+            name + ".density = " + parameter[0][1]['density'] + ";\n";
+        
+        return code;
+    }
 }

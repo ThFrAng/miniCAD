@@ -17,7 +17,7 @@
 				"imports": {
 					"three": "https://cdn.jsdelivr.net/npm/three@0.173.0/build/three.module.js",
                     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.173.0/examples/jsm/",
-					"miniCAD": "./miniCAD/miniCAD.js"
+					"miniCAD": "../miniCAD/miniCAD.js"
 				}
 			}
 		</script>
@@ -55,6 +55,16 @@
 
                 const light2 = new THREE.SpotLight(0xffff00, 1.7);
                 light2.position.set(1, 1, 0);
+                light2.castShadow = true;
+                light2.shadow.camera.near = 25;       
+                light2.shadow.camera.far = 163;      
+                light2.shadow.camera.left = -19;
+                light2.shadow.camera.right = 18;
+                light2.shadow.camera.top = 56;
+                light2.shadow.camera.bottom = -15;
+                light2.shadow.blurSamples = 30;
+                light2.shadow.mapSize.width = 512;
+                light2.shadow.mapSize.height = 512;
                 scene.add(light2);
                 miniCAD.add(light2, "SpotLight");
 

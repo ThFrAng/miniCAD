@@ -95,4 +95,20 @@ export class Light extends Object {
             folders[i].destroy();
         }
     }
+
+    saveShadow(name, parameter) {
+
+        let code =
+            name + ".castShadow = " + parameter[1][1]['shadow'] + ";\n" +
+            name + ".shadow.camera.near = " + parameter[1][1]['near'] + ";\n" +
+            name + ".shadow.camera.far = " + parameter[1][1]['far'] + ";\n" +
+            name + ".shadow.camera.left = " + parameter[1][1]['left'] + ";\n" +
+            name + ".shadow.camera.right = " + parameter[1][1]['right'] + ";\n" +
+            name + ".shadow.camera.top = " + parameter[1][1]['top'] + ";\n" +
+            name + ".shadow.camera.bottom = " + parameter[1][1]['bottom'] + ";\n" +
+            name + ".shadow.blurSamples = " + parameter[1][1]['blur_samples'] + ";\n" +
+            name + ".shadow.bias = " + parameter[1][1]['bias'] + ";\n";
+        
+        return code;
+    }
 }

@@ -15,17 +15,16 @@ https://threejs.org/
 import {Light} from './Light.js';
 
 export class AmbientLight extends Light {
+    isMoveable = false;
+
     constructor(base, gui, object) {
         super();
         super.base = base;
         super.gui = gui;
         super.object = object;
-        super.hasShadow = true;
 
         this.elementFolder = gui.addFolder('properties');
         this.open();
-
-        return this.elementFolder;
     }
 
     open() {
@@ -47,6 +46,14 @@ export class AmbientLight extends Light {
     }
 
     destroy() {
-        this.folder.destroy();
+        this.elementFolder.destroy();
+    }
+
+    save(name, parameter) {
+        let code =
+            name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
+            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n";
+
+        return code;
     }
 }

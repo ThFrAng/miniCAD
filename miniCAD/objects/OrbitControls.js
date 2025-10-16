@@ -58,4 +58,14 @@ export class OrbitControls {
     destroy() {
         this.folder.destroy();
     }
+
+    save(name, parameter) {
+        let code = 
+            name + ".maxAzimuthAngle = " + parameter[0][1]['max_azimuth_angle'] + ";\n" +
+            name + ".minAzimuthAngle = " + parameter[0][1]['min_azimuth_angle'] + ";\n" +
+            name + ".maxPolarAngle = " + parameter[0][1]['max_polar_angle'] + ";\n" +
+            name + ".minPolarAngle = " + parameter[0][1]['min_polar_angle'] + ";\n";
+
+        return code;
+    }
 }

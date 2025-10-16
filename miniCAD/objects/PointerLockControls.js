@@ -62,4 +62,6 @@ export class PointerLockControls {
     destroy() {
         this.folder.destroy();
     }
+
+    save() {return "";}
 }

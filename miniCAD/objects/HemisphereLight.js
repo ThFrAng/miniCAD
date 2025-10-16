@@ -21,12 +21,9 @@ export class HemisphereLight extends Light {
         super.base = base;
         super.gui = gui;
         super.object = object;
-        super.hasShadow = true;
 
         this.elementFolder = gui.addFolder('properties');
         this.open();
-
-        return this.elementFolder;
     }
 
     open() {
@@ -81,11 +78,19 @@ export class HemisphereLight extends Light {
         const helperFolder = elementFolder.addFolder('helper');
         helperFolder.add(helper, 'visible').onChange(function() {
         });
-    
-        return elementFolder;
     }
 
     destroy() {
-        this.folder.destroy();
+        this.elementFolder.destroy();
+    }
+
+    save(name, parameter) {
+        let code =
+            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_y'] + ");\n" +
+            name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
+            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".groundColor.setHex('" + parameter[0][1]['ground_color'] + "');\n";
+
+        return code;
     }
 }

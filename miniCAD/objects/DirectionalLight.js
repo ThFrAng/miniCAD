@@ -21,14 +21,14 @@ export class DirectionalLight extends Light {
         super.base = base;
         super.gui = gui;
         super.object = object;
-        super.hasShadow = true;
+        this.hasShadow = true;
 
         this.elementFolder = gui.addFolder('properties');
-        this.init();
+        this.init(base, object);
         this.open();
     }
 
-    init() {
+    init(base, object) {
         const elementFolder = this.elementFolder;
         const shadowFolder = (elementFolder) => {this.shadowFolder(elementFolder);}
         const emptyFolder = (folder) => {this.emptyFolder(folder);}
@@ -38,7 +38,16 @@ export class DirectionalLight extends Light {
             lightShadow: 'light'
         };
 
-        elementFolder.add(lightShadowParams, 'lightShadow', ['light', 'shadow']).name('light / shadow').onChange(function(value) {
+        elementFolder.add(lightShadowParams, 'lightShadow', ['light', 'shadow']).name('light / shadow')
+        .onChange(function(value) {
+            if(value == 'shadow') {
+                base.collection.saveObject(object, 'light');
+            }
+            else if(value == 'light') {
+                base.collection.saveObject(object, 'shadow');
+            }
+        })
+        .onFinishChange(function(value) {
         if(value == 'shadow') {
             emptyFolder(elementFolder);
             shadowFolder(elementFolder);
@@ -115,11 +124,24 @@ export class DirectionalLight extends Light {
         });
         const helperFolder = elementFolder.addFolder('helper');
         helperFolder.add(helper, 'visible');
+    }
     
-        return elementFolder;
+    destroy() {
+        this.elementFolder.destroy();
     }
 
-    destroy() {
-        this.folder.destroy();
+    save(name, parameter) {
+        const saveShadow = (name, parameter) => {return super.saveShadow(name, parameter);}
+
+        let code =
+            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
+            name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
+            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".target.position.set(" + parameter[0][1]['target_x'] + ", " + parameter[0][1]['target_y'] + ", " + parameter[0][1]['target_z'] + ");\n" +
+            name + ".target.updateMatrixWorld();\n";
+        
+        if(parameter[1] != null) {code += saveShadow(name, parameter);}
+
+        return code;
     }
 }

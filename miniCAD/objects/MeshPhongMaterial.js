@@ -75,4 +75,18 @@ export class MeshPhongMaterial extends Object {
     destroy() {
         this.folder.destroy();
     }
+
+    save(name, parameter) {
+        let code =
+            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".emissive.setHex('" + parameter[0][1]['emissive'] + "');\n" +
+            name + ".specular.setHex('" + parameter[0][1]['specular'] + "');\n" +
+            name + ".transparent = " + parameter[0][1]['transparent'] + ";\n" +
+            name + ".opacity = " + parameter[0][1]['opacity'] + ";\n" +
+            name + ".shininess = " + parameter[0][1]['shininess'] + ";\n" +
+            name + ".reflectivity = " + parameter[0][1]['reflectivity'] + ";\n" +
+            name + ".refractionRatio = " + parameter[0][1]['refraction_ratio'] + ";\n";
+
+        return code;
+    }
 }

@@ -20,8 +20,8 @@ let guiSave, collection, selectedObject;
 let opened = false;
 
 export class SaveGui {
-    constructor(objects, current) {
-        collection = objects;
+    constructor(_collection, current) {
+        collection = _collection;
         selectedObject = current;
         
         this.guiSave = openGui();
@@ -64,8 +64,6 @@ function openGui() {
         confirmation = guiSave.add(params, 'confirmation').name("");
         confirmation.disable();
 
-        confirmation.domElement.childNodes[0].children[0].style.color = "white";
-
         return guiSave;
     }
 }
@@ -77,8 +75,8 @@ function closeGui() {
 
 function save(params, confirmation) {
 
-    let save = [];
-    const names = collection.getNames()
+    let save = [[],[]];
+    const names = collection.getNames();
 
     for(let i = 0; i < names.length; i++) {
 
@@ -86,15 +84,17 @@ function save(params, confirmation) {
 
         const object = {
                 name: names[i],
-                parameters: selectedObject.save
+                parameters: selectedObject.save,
         }
-        if(object.parameters != 0) {
-                save[i] = object;
+        if(Object.keys(object.parameters).length > 0) {
+                save[0].push(object);
+                save[1].push(selectedObject.gui);
         }
     }
 
+
     if(params.format == "Js object" && params.include == "All modified objects") {
-        console.log(save);
+        console.log(save[0]);
         confirmation.name("Saved as a Js object in the console");
     }
     else if(params.format == "Code" && params.include == "All modified objects") {
@@ -103,7 +103,11 @@ function save(params, confirmation) {
     }
     else if(params.format == "Js object" && params.include == "Current") {
         console.log(selectedObject.name);
-        console.log(save[selectedObject.name]);
+        for(let i = 0; i < save[0].length; i++) {
+            if(save[0][i].name == selectedObject.name) {
+                console.log(save[0][i]);
+            }
+        }
         confirmation.name("Saved as a Js object in the console");
     }
     else if(params.format == "Code" && params.include == "Current") {
@@ -119,23 +123,20 @@ function save(params, confirmation) {
 
 function objToCode(save, selectedName) {
     let code = "";
-    for(let i = 0; i < save.length; i++) { //faire les save vide ne pas apparaitre
-        if(save[i] != null) {
-            
-            const name = save[i].name;
-            const parameters = Object.entries(save[i].parameters);
+    for(let i = 0; i < save[1].length; i++) {
+        if(save[0][i] != null) {
 
-            for(let i = 0; i < parameters.length; i++) {
-                
-                const rawName = parameters[i][0];
+            const name = save[0][i].name;
+            const parameters = Object.entries(save[0][i].parameters);
+            const parametersCode = save[1][i].save;
 
-                if(selectedName == null) {
-                    code += name + "." + names[rawName] + " = " + parameters[i][1] + ";\n";
-                }
-                else if(name == selectedName) {
-                    code += name + "." + names[rawName] + " = " + parameters[i][1] + ";\n";
-                }
+            if(selectedName == null) {
+                code += parametersCode(name, parameters);
             }
+            else if(name == selectedName) {
+                code += parametersCode(name, parameters);
+            }
+
             code += "\n";
         }
     }
