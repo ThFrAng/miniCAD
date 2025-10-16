@@ -32,6 +32,15 @@ Start to add objects you want to adjust : ``` miniCAD.add(box, "Box 1"); ``` <br
 To use the animation tools add the renderer to the declaration ``` const miniCAD = new MiniCAD(scene, camera, renderer); ```<br>
 
 <br/><br/>
+**NEW**<br/>
+Saving is available in 2 formats : as a JS Object or as written code.
+
+<br/><br/>
+**UP COMING**<br/>
+- Possibility to add custom object (for example shader uniforms)
+- Timeline for the Camera Travelling Path to adjust travelling time between points of the curve
+
+<br/><br/><br/>
 CONSTRUCTOR<br/>
 **MiniCAD(scene, camera, renderer)**
 - scene - three.js scene
