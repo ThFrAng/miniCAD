@@ -26,7 +26,7 @@ export class PointLight extends Light {
 
         this.elementFolder = gui.addFolder('properties');
         this.init(base, object);
-        this.folder = this.open();
+        this.open();
     }
 
     init(base, object) {
@@ -128,7 +128,7 @@ export class PointLight extends Light {
         let code = 
             name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
             name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
             name + ".decay = " + parameter[0][1]['decay'] + ";\n" +
             name + ".distance = " + parameter[0][1]['distance'] + ";\n";
 

@@ -52,7 +52,7 @@ export class AmbientLight extends Light {
     save(name, parameter) {
         let code =
             name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n";
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n";
 
         return code;
     }

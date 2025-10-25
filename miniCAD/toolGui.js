@@ -277,30 +277,29 @@ export class ToolGui {
 
 function updateObject() {
     if(updatable == true) {
-        for(let i = 0; i < gui.folders[1].controllers.length; i++) {
-
-            gui.folders[1].controllers[0].object.position_x = selectedObject.mesh.position.x;
-            gui.folders[1].controllers[0].object.position_y = selectedObject.mesh.position.y;
-            gui.folders[1].controllers[0].object.position_z = selectedObject.mesh.position.z;
-            gui.folders[1].controllers[1].updateDisplay();
-            gui.folders[1].controllers[2].updateDisplay();
-            gui.folders[1].controllers[3].updateDisplay();
-            
-
-            if(selectedObject.gui.isMesh == true) {
-                gui.folders[1].controllers[0].object.scale_x = selectedObject.mesh.scale.x;
-                gui.folders[1].controllers[0].object.scale_y = selectedObject.mesh.scale.y;
-                gui.folders[1].controllers[0].object.scale_z = selectedObject.mesh.scale.z;
-                gui.folders[1].controllers[4].updateDisplay();
-                gui.folders[1].controllers[5].updateDisplay();
-                gui.folders[1].controllers[6].updateDisplay();
-                gui.folders[1].controllers[0].object.rotation_x = selectedObject.mesh.rotation.x;
-                gui.folders[1].controllers[0].object.rotation_y = selectedObject.mesh.rotation.y;
-                gui.folders[1].controllers[0].object.rotation_z = selectedObject.mesh.rotation.z;
-                gui.folders[1].controllers[7].updateDisplay();
-                gui.folders[1].controllers[8].updateDisplay();
-                gui.folders[1].controllers[9].updateDisplay();
-            }
+        //change on controllers 2 in case of light / shadow, same for updateDisplay on controllers 4
+        gui.folders[1].controllers[2].object.position_x = selectedObject.mesh.position.x;
+        gui.folders[1].controllers[2].object.position_y = selectedObject.mesh.position.y;
+        gui.folders[1].controllers[2].object.position_z = selectedObject.mesh.position.z;
+        gui.folders[1].controllers[1].updateDisplay();
+        gui.folders[1].controllers[2].updateDisplay();
+        gui.folders[1].controllers[3].updateDisplay();
+        gui.folders[1].controllers[4].updateDisplay();
+        
+        
+        if(selectedObject.gui.isMesh == true) {
+            gui.folders[1].controllers[0].object.scale_x = selectedObject.mesh.scale.x;
+            gui.folders[1].controllers[0].object.scale_y = selectedObject.mesh.scale.y;
+            gui.folders[1].controllers[0].object.scale_z = selectedObject.mesh.scale.z;
+            gui.folders[1].controllers[4].updateDisplay();
+            gui.folders[1].controllers[5].updateDisplay();
+            gui.folders[1].controllers[6].updateDisplay();
+            gui.folders[1].controllers[0].object.rotation_x = selectedObject.mesh.rotation.x;
+            gui.folders[1].controllers[0].object.rotation_y = selectedObject.mesh.rotation.y;
+            gui.folders[1].controllers[0].object.rotation_z = selectedObject.mesh.rotation.z;
+            gui.folders[1].controllers[7].updateDisplay();
+            gui.folders[1].controllers[8].updateDisplay();
+            gui.folders[1].controllers[9].updateDisplay();
         }
     }
 }

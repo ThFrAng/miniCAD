@@ -111,7 +111,7 @@ export class RectAreaLight extends Light {
             name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
             name + ".width = " + parameter[0][1]['width'] + ";\n" +
             name + ".height = " + parameter[0][1]['height'] + ";\n" +
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
             name + ".lookAt(" + parameter[0][1]['target_x'] + ", " + parameter[0][1]['target_y'] + ", " + parameter[0][1]['target_z'] + ");\n";
 
         return code;

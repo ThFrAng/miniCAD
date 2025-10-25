@@ -25,7 +25,6 @@ export class Group {
         this.gui = gui;
         this.object = object;
 
-        this.getCenter();
         this.folder = this.open();
     }
 

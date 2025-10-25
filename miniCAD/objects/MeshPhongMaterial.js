@@ -78,9 +78,9 @@ export class MeshPhongMaterial extends Object {
 
     save(name, parameter) {
         let code =
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
-            name + ".emissive.setHex('" + parameter[0][1]['emissive'] + "');\n" +
-            name + ".specular.setHex('" + parameter[0][1]['specular'] + "');\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
+            name + ".emissive.setHex(" + parameter[0][1]['emissive'].replace("#", "0x") + ");\n" +
+            name + ".specular.setHex(" + parameter[0][1]['specular'].replace("#", "0x") + ");\n" +
             name + ".transparent = " + parameter[0][1]['transparent'] + ";\n" +
             name + ".opacity = " + parameter[0][1]['opacity'] + ";\n" +
             name + ".shininess = " + parameter[0][1]['shininess'] + ";\n" +

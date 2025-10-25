@@ -54,7 +54,7 @@ export class FogExp2 extends Object {
 
     save(name, parameter) {
         let code =
-            name + ".color.setHex('" + parameter[0][1]['color'] + ";\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
             name + ".density = " + parameter[0][1]['density'] + ";\n";
         
         return code;

@@ -88,8 +88,8 @@ export class HemisphereLight extends Light {
         let code =
             name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_y'] + ");\n" +
             name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
-            name + ".groundColor.setHex('" + parameter[0][1]['ground_color'] + "');\n";
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
+            name + ".groundColor.setHex(" + parameter[0][1]['ground_color'].replace("#", "0x") + ");\n";
 
         return code;
     }

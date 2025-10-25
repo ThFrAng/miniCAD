@@ -16,7 +16,7 @@ import {Object} from './Object.js';
 
 
 export class Light extends Object {
-    isMesh = true;
+    isMesh = false;
     hasShadow = false;
     isMoveable = true;
 

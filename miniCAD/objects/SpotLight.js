@@ -154,13 +154,13 @@ export class SpotLight extends Light {
         const saveShadow = (name, parameter) => {return super.saveShadow(name, parameter);}
 
         let code =
-            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_y'] + ");\n" +
+            name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
             name + ".intensity = " + parameter[0][1]['intensity'] + ";\n" +
             name + ".decay = " + parameter[0][1]['decay'] + ";\n" +
             name + ".distance = " + parameter[0][1]['distance'] + ";\n" +
             name + ".penumbra = " + parameter[0][1]['penumbra'] + ";\n" +
             name + ".angle = " + parameter[0][1]['angle'] + ";\n" +
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
             name + ".target.position.set(" + parameter[0][1]['target_x'] + ", " + parameter[0][1]['target_y'] + ", " + parameter[0][1]['target_z'] + ");\n" +
             name + ".target.updateMatrixWorld();\n";
 

@@ -58,7 +58,7 @@ export class Fog extends Object {
 
     save(name, parameter) {
         let code =
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
             name + ".near = " + parameter[0][1]['near'] + ";\n" +
             name + ".far = " + parameter[0][1]['far'] + ";\n";
             

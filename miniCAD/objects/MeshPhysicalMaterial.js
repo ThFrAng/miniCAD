@@ -121,8 +121,8 @@ export class MeshPhysicalMaterial extends Object {
 
     save(name, parameter) {
         let code = 
-            name + ".color.setHex('" + parameter[0][1]['color'] + "');\n" +
-            name + ".emissive.setHex('" + parameter[0][1]['emissive'] + "');\n" +
+            name + ".color.setHex(" + parameter[0][1]['color'].replace("#", "0x") + ");\n" +
+            name + ".emissive.setHex(" + parameter[0][1]['emissive'].replace("#", "0x") + ");\n" +
             name + ".transparent = " + parameter[0][1]['transparent'] + ";\n" +
             name + ".opacity = " + parameter[0][1]['opacity'] + ";\n" +
             name + ".roughtness = " + parameter[0][1]['roughtness'] + ";\n" +
@@ -133,11 +133,11 @@ export class MeshPhysicalMaterial extends Object {
             name + ".iridescenceIOR = " + parameter[0][1]['iridescence_ior'] + ";\n" +
             name + ".sheen = " + parameter[0][1]['sheen'] + ";\n" +
             name + ".sheenRoughtness = " + parameter[0][1]['sheen_roughtness'] + ";\n" +
-            name + ".sheenColor.setHex('" + parameter[0][1]['sheen_color'] + "');\n" +
+            name + ".sheenColor.setHex(" + parameter[0][1]['sheen_color'].replace("#", "0x") + ");\n" +
             name + ".clearcoat = " + parameter[0][1]['clearcoat'] + ";\n" +
             name + ".clearcoatRoughtness = " + parameter[0][1]['clearcoat_roughtness'] + ";\n" +
             name + ".specularIntensity = " + parameter[0][1]['specular_intensity'] + ";\n" +
-            name + ".specularColor.setHex('" + parameter[0][1]['specular_color'] + ";\n" +
+            name + ".specularColor.setHex(" + parameter[0][1]['specular_color'].replace("#", "0x") + ");\n" +
             name + ".thickness = " + parameter[0][1]['thickness'] + ";\n" +
             name + ".transission = " + parameter[0][1]['transmission'] + ";\n";
 
