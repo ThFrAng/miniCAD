@@ -1,6 +1,6 @@
 /*
         ThFrAng
-        2025
+        2026
 
 https://github.com/ThFrAng/miniCAD/
 

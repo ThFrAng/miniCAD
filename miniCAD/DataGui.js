@@ -27,6 +27,8 @@ import {MeshPhongMaterial} from './objects/MeshPhongMaterial.js'
 import {Group} from './objects/Group.js';
 import {PointerLockControls} from './objects/PointerLockControls.js';
 import {OrbitControls} from './objects/OrbitControls.js';
+import {OrthographicCamera} from './objects/OrthographicCamera.js';
+import {PerspectiveCamera} from './objects/PerspectiveCamera.js';
 
 
 export class DataGui {
@@ -47,6 +49,8 @@ export class DataGui {
             case 'Group': return new Group(base, gui, object);
             case 'PointerLockControls': return new PointerLockControls(base, gui, object);
             case 'OrbitControls': return new OrbitControls(base, gui, object);
+            case 'OrthographicCamera': return new OrthographicCamera(base, gui, object);
+            case 'PerspectiveCamera': return new PerspectiveCamera(base, gui, object);
         }
     }
 }

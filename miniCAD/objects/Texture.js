@@ -12,103 +12,79 @@ https://threejs.org/
 
 */
 
-import * as THREE from 'three';
-import {Object} from './Object.js';
 
-
-export class Group extends Object {
-    isMesh = true;
+export class Texture {
+    isMesh = false;
     hasShadow = false;
-    isMoveable = true;
+    isMoveable = false;
 
     constructor(base, gui, object) {
-        super();
-        super.base = base;
-        super.gui = gui;
-        super.object = object;
+        this.base = base;
+        this.gui = gui;
+        this.object = object;
 
         this.folder = this.open();
     }
 
-    open() {        
-        const elementFolder = this.gui.addFolder('properties');
+    open() {
         const object = this.object;
-        const moveToCamera = () => {
-            this.moveToCamera();
-        };
 
+        
+        const elementFolder = this.gui.addFolder('properties');
         const params = {
-            move_to_camera: function() {
-                moveToCamera();
-                params.position_x = object.mesh.position.x;
-                positionX.updateDisplay();
-                params.position_y = object.mesh.position.y;
-                positionY.updateDisplay();
-                params.position_z = object.mesh.position.z;
-                positionZ.updateDisplay();
-            },
-            position_x: object.mesh.position.x,
-            position_y: object.mesh.position.y,
-            position_z: object.mesh.position.z,
-            scale_x: object.mesh.scale.x,
-            scale_y: object.mesh.scale.y,
-            scale_z: object.mesh.scale.z,
-            rotation_x: object.mesh.rotation.x,
-            rotation_y: object.mesh.rotation.y,
-            rotation_z: object.mesh.rotation.z
+            info: function(){},
+            needs_update: object.mesh.needsUpdate,
+            repeat_x: object.mesh.repeat.x,
+            repeat_y: object.mesh.repeat.y,
+            center_x: object.mesh.center.x,
+            center_y: object.mesh.center.y,
+            
+
+            
         };
 
+        elementFolder.add(params, 'info').name("needs_update should be enable here and on the material as well");
         elementFolder.add(params, 'move_to_camera').name("move to camera");
         const positionX = elementFolder.add(params, 'position_x').onChange(function(value) {
             object.mesh.position.x = value;
-            object.mesh.updateMatrix();
         });
         const positionY = elementFolder.add(params, 'position_y').onChange(function(value) {
             object.mesh.position.y = value;
-            object.mesh.updateMatrix();
         });
         const positionZ = elementFolder.add(params, 'position_z').onChange(function(value) {
             object.mesh.position.z = value;
-            object.mesh.updateMatrix();
-        });
+        }); 
         elementFolder.add(params, 'scale_x').onChange(function(value) {
             object.mesh.scale.x = value;
-            object.mesh.updateMatrix();
         });
         elementFolder.add(params, 'scale_y').onChange(function(value) {
             object.mesh.scale.y = value;
-            object.mesh.updateMatrix();
         });
         elementFolder.add(params, 'scale_z').onChange(function(value) {
             object.mesh.scale.z = value;
-            object.mesh.updateMatrix();
         });
         elementFolder.add(params, 'rotation_x', 0, 2*Math.PI).onChange(function(value) {
             object.mesh.rotation.x = value;
-            object.mesh.updateMatrix();
         });
         elementFolder.add(params, 'rotation_y', 0, 2*Math.PI).onChange(function(value) {
             object.mesh.rotation.y = value;
-            object.mesh.updateMatrix();
         });
         elementFolder.add(params, 'rotation_z', 0, 2*Math.PI).onChange(function(value) {
             object.mesh.rotation.z = value;
-            object.mesh.updateMatrix();
         });
-        
+
         return elementFolder;
     }
-    
+
     destroy() {
         this.folder.destroy();
     }
 
     save(name, parameter) {
-        const code =
+        let code =
             name + ".position.set(" + parameter[0][1]['position_x'] + ", " + parameter[0][1]['position_y'] + ", " + parameter[0][1]['position_z'] + ");\n" +
             name + ".scale.set(" + parameter[0][1]['scale_x'] + ", " + parameter[0][1]['scale_y'] + ", " + parameter[0][1]['scale_z'] + ");\n" +
             name + ".rotation.set(" + parameter[0][1]['rotation_x'] + ", " + parameter[0][1]['rotation_y'] + ", " + parameter[0][1]['rotation_z'] + ");\n";
-        
         
         return code;
     }

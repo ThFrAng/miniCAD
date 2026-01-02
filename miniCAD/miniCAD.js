@@ -1,6 +1,6 @@
 /*
         ThFrAng
-        2025
+        2026
 
 https://github.com/ThFrAng/miniCAD/
 
@@ -19,13 +19,14 @@ import {DataGui} from './DataGui.js';
 import {ToolGui} from './toolGui.js';
 import {AnimationGui} from './animation/AnimationGui.js';
 import {SaveGui} from './saveGui.js';
+import {InfoGui} from './InfoGui.js';
 import {loadOptions, stats} from './options.js';
 import settings from './settings.json' with {type: 'json'};
 
 let objects = [];
 let names = [];
-let guis = []; // 0: main gui; 1: toolGui; 2: info option; 3: animation gui; 10: pop ups
-let toolGui, animationGui;
+let guis = []; // 0: main gui; 1: toolGui; 2: info option; 3: animation gui; 4: info gui 10: pop ups
+let toolGui, animationGui, infoGui;
 
 let bufferCameraPosition = new THREE.Vector3(0, 0, 0);
 
@@ -161,16 +162,7 @@ function load(gui, base) {
     var selectedObject = 0;
 
     const headerParams = {
-        animation: function() {
-            animationGui = new AnimationGui(base, guis, importPoints);
-            guis[3] = animationGui;
-        },
-        save: function() {
-            if(guis[10] != null) {guis[10].destroy();}
-            guis[10] = new SaveGui(collection, selectedObject);
-            
-            collection.saveObject(selectedObject);
-        },
+        functions: "functions",
         camera_x: base.camera.position.x,
         camera_y: base.camera.position.y,
         camera_z: base.camera.position.z,
@@ -190,8 +182,31 @@ function load(gui, base) {
         }
     }
 
-    headerFolder.add(headerParams, 'animation');
-    headerFolder.add(headerParams, 'save');
+    const functionTab = headerFolder.add(headerParams, 'functions', ['save', 'info', 'animation']).onChange(function(value) {
+        headerParams.functions = "functions";
+        functionTab.updateDisplay();
+
+        switch(value) {
+            case 'save' :
+                if(guis[10] != null) {guis[10].destroy();}
+                guis[10] = new SaveGui(collection, selectedObject);
+                collection.saveObject(selectedObject);
+                break;
+
+            case 'info' :
+                infoGui = new InfoGui(base);
+                guis[4] = infoGui;
+                break;
+
+            case 'animation' : 
+                animationGui = new AnimationGui(base, guis, importPoints);
+                guis[3] = animationGui;
+                break; 
+        }
+    });
+    functionTab.domElement.children[0].style.display = "none";
+    functionTab.domElement.children[1].children[1].style.width = "100%";
+
     const controllerX = headerFolder.add(headerParams, 'camera_x').onChange(function(value) {
         bufferCameraPosition.copy(base.camera.position);
         bufferCameraPosition.x = value;
@@ -248,4 +263,5 @@ function animate() {
     requestAnimationFrame(animate);
     if(stats != null) {stats.update();}
     if(animationGui != null) {animationGui.animate();}
+    if(infoGui != null) {infoGui.animate();}
 }

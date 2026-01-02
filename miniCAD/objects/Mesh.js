@@ -38,7 +38,7 @@ export class Mesh extends Object {
         const elementFolder = this.gui.addFolder('properties');
         const params = {
             move_to_camera: function() {
-                moveToCamera()
+                moveToCamera();
                 params.position_x = object.mesh.position.x;
                 positionX.updateDisplay();
                 params.position_y = object.mesh.position.y;
